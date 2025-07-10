@@ -1,0 +1,4 @@
+test_html_reports/
+docs/
+coverage/
+node_modules
