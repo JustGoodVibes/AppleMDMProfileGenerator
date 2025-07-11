@@ -23,6 +23,10 @@ on:
         default: 'false'
         type: boolean
 
+permissions:
+  contents: write  # Required to commit and push changes
+  actions: read    # Required to read workflow information
+
 env:
   CACHE_DIR: cache
   BASE_URL: https://developer.apple.com/tutorials/data/documentation/devicemanagement
@@ -282,8 +286,11 @@ jobs:
     - name: Check for changes
       id: changes
       run: |
-        # Check if there are any changes in the cache directory
-        if git diff --quiet HEAD -- ${{ env.CACHE_DIR }}/; then
+        # Add all files in cache directory to staging area first
+        git add ${{ env.CACHE_DIR }}/
+
+        # Check if there are any changes (both tracked and untracked files)
+        if git diff --quiet --cached; then
           echo "No changes detected in cache directory"
           echo "has_changes=false" >> $GITHUB_OUTPUT
         else
@@ -292,7 +299,11 @@ jobs:
 
           # Show what changed
           echo "Changed files:"
-          git diff --name-only HEAD -- ${{ env.CACHE_DIR }}/
+          git diff --name-only --cached
+
+          # Show summary of changes
+          echo "Summary:"
+          git diff --stat --cached
         fi
 
     - name: Commit and push changes
@@ -301,9 +312,6 @@ jobs:
         # Configure git
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-
-        # Add changes
-        git add ${{ env.CACHE_DIR }}/
 
         # Create commit message
         COMMIT_MSG="chore: update Apple MDM documentation cache"
@@ -317,7 +325,7 @@ jobs:
           COMMIT_MSG="$COMMIT_MSG - $NEW_FILES new files"
         fi
 
-        # Commit changes
+        # Commit changes (files are already staged from the changes check step)
         git commit -m "$COMMIT_MSG"
 
         # Push changes
