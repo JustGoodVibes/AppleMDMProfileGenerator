@@ -1,10 +1,10 @@
 name: Cache Apple MDM Documentation
 
 on:
-  # Trigger on push to main branch
+  # Trigger on push to main branch and github-actions branch (for testing)
   push:
-    branches: [ main ]
-  
+    branches: [ main, github-actions ]
+
   # Trigger on pull requests
   pull_request:
     types: [opened, synchronize, reopened]
