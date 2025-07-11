@@ -1,26 +1,22 @@
 name: Cache Apple MDM Documentation
 
 on:
-  # Trigger on push to main branch
-  push:
-    branches: [ main ]
-
-  # Trigger on pull requests
+  # Trigger on pull requests (validation only - no downloads)
   pull_request:
     types: [opened, synchronize, reopened]
     branches: [ main ]
-  
+
   # Scheduled runs - daily at 2 AM UTC
   schedule:
     - cron: '0 2 * * *'
-  
-  # Manual workflow dispatch
+
+  # Manual workflow dispatch with force refresh option
   workflow_dispatch:
     inputs:
       force_refresh:
-        description: 'Force refresh all cached files'
+        description: 'Force refresh all cached files (ignore 24-hour timestamp check)'
         required: false
-        default: 'false'
+        default: false
         type: boolean
 
 permissions:
@@ -57,9 +53,82 @@ jobs:
     
     - name: Create cache directory
       run: mkdir -p ${{ env.CACHE_DIR }}
-    
+
+    - name: Check cache freshness
+      id: cache_check
+      run: |
+        # Check if we should skip downloads based on timestamp
+        SHOULD_DOWNLOAD="true"
+        SKIP_REASON=""
+
+        # Check if this is a PR event (validation only)
+        if [ "${{ github.event_name }}" = "pull_request" ]; then
+          SHOULD_DOWNLOAD="false"
+          SKIP_REASON="Pull request validation - downloads disabled"
+        # Check force refresh flag
+        elif [ "${{ github.event.inputs.force_refresh }}" = "true" ]; then
+          SHOULD_DOWNLOAD="true"
+          SKIP_REASON="Force refresh enabled - proceeding with download"
+        # Check if manifest exists and is less than 24 hours old
+        elif [ -f "${{ env.CACHE_DIR }}/manifest.json" ]; then
+          # Get the generated_at timestamp from manifest
+          MANIFEST_TIME=$(node -e "
+            try {
+              const fs = require('fs');
+              const manifest = JSON.parse(fs.readFileSync('${{ env.CACHE_DIR }}/manifest.json', 'utf8'));
+              console.log(manifest.generated_at || '');
+            } catch (e) {
+              console.log('');
+            }
+          ")
+
+          if [ -n "$MANIFEST_TIME" ]; then
+            # Calculate time difference in hours
+            CURRENT_TIME=$(date -u +%s)
+            MANIFEST_TIMESTAMP=$(node -e "console.log(Math.floor(new Date('$MANIFEST_TIME').getTime() / 1000))")
+            TIME_DIFF_HOURS=$(( (CURRENT_TIME - MANIFEST_TIMESTAMP) / 3600 ))
+
+            if [ $TIME_DIFF_HOURS -lt 24 ]; then
+              SHOULD_DOWNLOAD="false"
+              SKIP_REASON="Cache is fresh (${TIME_DIFF_HOURS} hours old, less than 24 hours)"
+            else
+              SHOULD_DOWNLOAD="true"
+              SKIP_REASON="Cache is stale (${TIME_DIFF_HOURS} hours old, more than 24 hours)"
+            fi
+          else
+            SHOULD_DOWNLOAD="true"
+            SKIP_REASON="Invalid manifest timestamp - proceeding with download"
+          fi
+        else
+          SHOULD_DOWNLOAD="true"
+          SKIP_REASON="No existing manifest found - initial download"
+        fi
+
+        echo "should_download=$SHOULD_DOWNLOAD" >> $GITHUB_OUTPUT
+        echo "skip_reason=$SKIP_REASON" >> $GITHUB_OUTPUT
+
+        # Log the decision
+        echo "🔍 Cache Check Decision: $SKIP_REASON"
+        if [ "$SHOULD_DOWNLOAD" = "true" ]; then
+          echo "✅ Proceeding with Apple MDM documentation download"
+        else
+          echo "⏭️ Skipping download to respect Apple's servers"
+        fi
+
+    - name: Skip download notification
+      if: steps.cache_check.outputs.should_download == 'false'
+      run: |
+        echo "⏭️ Skipping Apple MDM documentation download"
+        echo "📋 Reason: ${{ steps.cache_check.outputs.skip_reason }}"
+        echo "🌐 This helps respect Apple's servers and reduces unnecessary API calls"
+        echo ""
+        echo "To force a refresh:"
+        echo "1. Go to Actions tab → Cache Apple MDM Documentation"
+        echo "2. Click 'Run workflow' and enable 'Force refresh'"
+
     - name: Download Apple MDM Documentation
       id: download
+      if: steps.cache_check.outputs.should_download == 'true'
       run: |
         echo "Starting Apple MDM documentation download..."
         
@@ -307,7 +376,7 @@ jobs:
         fi
 
     - name: Commit and push changes
-      if: steps.changes.outputs.has_changes == 'true'
+      if: steps.cache_check.outputs.should_download == 'true' && steps.changes.outputs.has_changes == 'true'
       run: |
         # Configure git
         git config --local user.email "action@github.com"
@@ -338,12 +407,23 @@ jobs:
       run: |
         echo "## Apple MDM Documentation Cache Update" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
-        echo "### Summary" >> $GITHUB_STEP_SUMMARY
-        echo "- **Total files processed:** ${{ steps.download.outputs.total }}" >> $GITHUB_STEP_SUMMARY
-        echo "- **Successfully downloaded:** ${{ steps.download.outputs.downloaded }}" >> $GITHUB_STEP_SUMMARY
-        echo "- **Updated files:** ${{ steps.download.outputs.updated }}" >> $GITHUB_STEP_SUMMARY
-        echo "- **Failed downloads:** ${{ steps.download.outputs.failed }}" >> $GITHUB_STEP_SUMMARY
-        echo "- **Changes committed:** ${{ steps.changes.outputs.has_changes }}" >> $GITHUB_STEP_SUMMARY
+
+        # Show cache check decision
+        echo "### Cache Check Decision" >> $GITHUB_STEP_SUMMARY
+        echo "**Reason:** ${{ steps.cache_check.outputs.skip_reason }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+
+        if [ "${{ steps.cache_check.outputs.should_download }}" = "true" ]; then
+          echo "### Download Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- **Total files processed:** ${{ steps.download.outputs.total }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Successfully downloaded:** ${{ steps.download.outputs.downloaded }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Updated files:** ${{ steps.download.outputs.updated }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Failed downloads:** ${{ steps.download.outputs.failed }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Changes committed:** ${{ steps.changes.outputs.has_changes }}" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "### Download Status" >> $GITHUB_STEP_SUMMARY
+          echo "⏭️ **Downloads skipped** - ${{ steps.cache_check.outputs.skip_reason }}" >> $GITHUB_STEP_SUMMARY
+        fi
         echo "" >> $GITHUB_STEP_SUMMARY
 
         if [ -f "${{ env.CACHE_DIR }}/manifest.json" ]; then
