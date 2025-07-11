@@ -968,6 +968,68 @@ class SectionComponents {
 
         return exampleSection;
     }
+
+    /**
+     * Reset all sections to their initial state
+     * Used during application reset
+     */
+    resetAllSections() {
+        try {
+            // Clear expanded sections set
+            this.expandedSections.clear();
+
+            // Reset all section UI states
+            const allSections = document.querySelectorAll('.config-section');
+            allSections.forEach(section => {
+                // Collapse all sections
+                const content = section.querySelector('.section-content');
+                if (content) {
+                    content.classList.remove('expanded');
+                    content.style.display = 'none';
+                }
+
+                // Reset toggle icons
+                const toggle = section.querySelector('.section-toggle i');
+                if (toggle) {
+                    toggle.className = ICONS.EXPAND;
+                }
+
+                // Update tooltip
+                const toggleBtn = section.querySelector('.section-toggle');
+                if (toggleBtn) {
+                    toggleBtn.setAttribute('data-tooltip', 'Expand section');
+                }
+
+                // Remove modified indicators
+                section.classList.remove('modified');
+
+                // Reset parameter container state but preserve loaded parameters
+                const parametersContainer = section.querySelector('[id^="parameters-"]');
+                if (parametersContainer) {
+                    // Keep the loaded state as 'true' if parameters are already loaded
+                    // This preserves the parameter definitions while allowing value reset
+                    if (parametersContainer.dataset.loaded === 'true' && parametersContainer.children.length > 0) {
+                        // Parameters are loaded, keep them but they'll be reset by clearAllParameters()
+                        console.log(`Preserving loaded parameters for section: ${section.id}`);
+                    } else {
+                        // No parameters loaded yet, keep as unloaded
+                        parametersContainer.dataset.loaded = 'false';
+                    }
+                }
+            });
+
+            // Clear navigation active states
+            const navItems = document.querySelectorAll('.section-nav-item');
+            navItems.forEach(item => {
+                item.classList.remove('active', 'modified');
+            });
+
+            console.log('Section components reset successfully');
+
+        } catch (error) {
+            console.error('Error resetting section components:', error);
+        }
+    }
 }
 
 // Create and export singleton instance

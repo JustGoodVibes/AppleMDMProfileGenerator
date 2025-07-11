@@ -361,6 +361,58 @@ class StateManager {
     }
 
     /**
+     * Reset all application data and state
+     * This is a comprehensive reset that clears everything
+     */
+    resetAllData() {
+        console.log('Starting complete application reset...');
+
+        try {
+            // Reset internal state
+            this.resetState();
+
+            // Clear export service data
+            if (typeof exportService !== 'undefined') {
+                exportService.clearModifiedParameters();
+            }
+
+            // Clear filter manager localStorage
+            try {
+                localStorage.removeItem('apple_mdm_filters');
+            } catch (error) {
+                console.warn('Failed to clear filter localStorage:', error);
+            }
+
+            // Clear any other application-specific localStorage keys
+            const keysToRemove = [
+                'apple_mdm_cache',
+                'apple_mdm_user_settings',
+                'apple_mdm_section_states'
+            ];
+
+            keysToRemove.forEach(key => {
+                try {
+                    localStorage.removeItem(key);
+                } catch (error) {
+                    console.warn(`Failed to clear localStorage key ${key}:`, error);
+                }
+            });
+
+            // Dispatch reset event for other components
+            document.dispatchEvent(new CustomEvent('applicationReset', {
+                detail: { timestamp: new Date().toISOString() }
+            }));
+
+            console.log('Application reset completed successfully');
+            return true;
+
+        } catch (error) {
+            console.error('Failed to reset application data:', error);
+            return false;
+        }
+    }
+
+    /**
      * Restore UI state after data load
      */
     restoreUIState() {

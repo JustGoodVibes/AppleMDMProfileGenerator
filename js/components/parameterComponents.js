@@ -950,6 +950,71 @@ class ParameterComponents {
     clearParameters() {
         this.parameterElements.clear();
     }
+
+    /**
+     * Clear all parameter values and reset to initial state
+     * Used during application reset - preserves parameter definitions
+     */
+    clearAllParameters() {
+        try {
+            // Reset all parameter inputs in the DOM to their default values
+            const allInputs = document.querySelectorAll('.parameter-input input, .parameter-input select, .parameter-input textarea');
+            allInputs.forEach(input => {
+                if (input.type === 'checkbox') {
+                    input.checked = false;
+                } else {
+                    input.value = '';
+                }
+
+                // Remove validation classes
+                input.classList.remove('invalid', 'valid');
+
+                // Reset to default placeholder if it exists
+                if (input.dataset.defaultValue) {
+                    input.value = input.dataset.defaultValue;
+                }
+            });
+
+            // Reset all toggle states to false
+            const allToggles = document.querySelectorAll('.toggle-state');
+            allToggles.forEach(toggle => {
+                toggle.classList.remove('active');
+                toggle.textContent = 'false';
+            });
+
+            // Clear all array inputs but preserve the array structure
+            const allArrays = document.querySelectorAll('.array-items');
+            allArrays.forEach(arrayContainer => {
+                arrayContainer.innerHTML = '';
+
+                // Reset array title to show 0 items
+                const arrayTitle = arrayContainer.parentElement?.querySelector('.array-title');
+                if (arrayTitle) {
+                    const parameterKey = arrayContainer.dataset.parameterKey || 'items';
+                    arrayTitle.textContent = `${parameterKey} (0 items)`;
+                }
+            });
+
+            // Remove modified classes from parameter containers but keep the containers
+            const allParameterContainers = document.querySelectorAll('.parameter');
+            allParameterContainers.forEach(container => {
+                container.classList.remove('modified');
+            });
+
+            // Reset parameter elements map to track the existing elements
+            // Don't clear the map entirely, just reset the tracking for modified states
+            this.parameterElements.forEach((element, key) => {
+                if (element && element.classList) {
+                    element.classList.remove('modified');
+                }
+            });
+
+            console.log('Parameter values cleared successfully - definitions preserved');
+
+        } catch (error) {
+            console.error('Error clearing parameter values:', error);
+        }
+    }
 }
 
 // Create and export singleton instance

@@ -109,6 +109,12 @@ body {
     gap: var(--spacing-xs);
 }
 
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
 .app-title {
     font-size: var(--font-size-2xl);
     font-weight: 700;
@@ -169,6 +175,19 @@ body {
 .btn-secondary:hover:not(:disabled) {
     background: var(--background-primary);
     border-color: var(--secondary-gray);
+}
+
+.btn-danger {
+    background: var(--error-red);
+    color: white;
+    border: 1px solid var(--error-red);
+}
+
+.btn-danger:hover:not(:disabled) {
+    background: #CC2E24;
+    border-color: #CC2E24;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
 }
 
 /* Loading Screen */

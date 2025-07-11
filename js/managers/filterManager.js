@@ -28,12 +28,26 @@ class FilterManager {
      */
     initialize() {
         if (this.isInitialized) return;
-        
+
         this.setupEventListeners();
         this.loadSavedFilters();
+        this.setupResetListener();
         this.isInitialized = true;
-        
+
         console.log('Filter Manager initialized');
+    }
+
+    /**
+     * Setup listener for application reset events
+     */
+    setupResetListener() {
+        document.addEventListener('applicationReset', () => {
+            this.resetForApplicationReset();
+            // Re-initialize UI after reset
+            setTimeout(() => {
+                this.updateFilterControls();
+            }, 100);
+        });
     }
 
     /**
@@ -483,17 +497,43 @@ class FilterManager {
             showPriorityMedium: DEFAULTS.SHOW_PRIORITY_MEDIUM,
             showPriorityLow: DEFAULTS.SHOW_PRIORITY_LOW
         };
-        
+
         // Update UI controls
         this.updateFilterControls();
-        
+
         // Apply filters
         this.applyFilters();
-        
+
         // Save to localStorage
         this.saveFilters();
-        
+
         console.log('Filters reset to defaults');
+    }
+
+    /**
+     * Complete reset for application reset functionality
+     * Clears filters and localStorage without applying them
+     */
+    resetForApplicationReset() {
+        // Reset filters to defaults
+        this.filters = {
+            search: DEFAULTS.SEARCH_QUERY,
+            showModifiedOnly: DEFAULTS.SHOW_MODIFIED_ONLY,
+            hideDeprecated: DEFAULTS.HIDE_DEPRECATED,
+            platform: DEFAULTS.SELECTED_PLATFORM,
+            showPriorityHigh: DEFAULTS.SHOW_PRIORITY_HIGH,
+            showPriorityMedium: DEFAULTS.SHOW_PRIORITY_MEDIUM,
+            showPriorityLow: DEFAULTS.SHOW_PRIORITY_LOW
+        };
+
+        // Clear localStorage
+        try {
+            localStorage.removeItem('apple_mdm_filters');
+        } catch (error) {
+            console.warn('Failed to clear filter localStorage:', error);
+        }
+
+        console.log('Filter manager reset for application reset');
     }
 
     /**

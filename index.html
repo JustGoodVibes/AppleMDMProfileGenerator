@@ -23,6 +23,10 @@
                     <span class="app-subtitle">Create configuration profiles for iOS, macOS, tvOS, and watchOS</span>
                 </div>
                 <div class="header-right">
+                    <button id="reset-all-btn" class="btn btn-secondary" data-tooltip="Clear all configured parameters, filters, and preferences">
+                        <i class="fas fa-undo"></i>
+                        Reset All
+                    </button>
                     <button id="export-btn" class="btn btn-primary" disabled>
                         <i class="fas fa-download"></i>
                         Export Profile
@@ -192,6 +196,45 @@
                     <button id="download-profile" class="btn btn-primary">
                         <i class="fas fa-download"></i>
                         Download .mobileconfig
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reset Confirmation Modal -->
+        <div id="reset-confirmation-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Reset All Data</h3>
+                    <button class="modal-close" aria-label="Close reset confirmation dialog">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="reset-warning">
+                        <div class="warning-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="warning-content">
+                            <p><strong>This action will permanently clear all data and cannot be undone.</strong></p>
+                            <p>The following will be reset:</p>
+                            <ul>
+                                <li>All configured MDM parameters across all sections</li>
+                                <li>All active filters (search, priority, platform, modified-only)</li>
+                                <li>All expanded/collapsed section states</li>
+                                <li>All cached user preferences stored locally</li>
+                            </ul>
+                            <p>The application will return to its initial state as if freshly loaded.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="reset-cancel-btn" class="btn btn-secondary modal-close" autofocus aria-label="Cancel reset operation">
+                        Cancel
+                    </button>
+                    <button id="reset-confirm-btn" class="btn btn-danger" aria-label="Confirm reset all data">
+                        <i class="fas fa-undo"></i>
+                        Reset All
                     </button>
                 </div>
             </div>

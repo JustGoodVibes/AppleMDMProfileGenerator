@@ -47,9 +47,18 @@ class UIManager {
                 this.showExportModal();
             });
         }
+
+        // Reset All button
+        const resetBtn = document.getElementById('reset-all-btn');
+        if (resetBtn) {
+            resetBtn.addEventListener('click', () => {
+                this.showResetConfirmationModal();
+            });
+        }
         
         // Modal events
         this.setupModalEvents();
+        this.setupResetModalEvents();
         
         // Retry button
         const retryBtn = document.getElementById('retry-btn');
@@ -96,6 +105,52 @@ class UIManager {
             input.addEventListener('input', () => {
                 this.updateExportPreview();
             });
+        });
+    }
+
+    /**
+     * Setup reset confirmation modal events
+     */
+    setupResetModalEvents() {
+        const modal = document.getElementById('reset-confirmation-modal');
+        if (!modal) return;
+
+        // Close modal events
+        const closeButtons = modal.querySelectorAll('.modal-close');
+        closeButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                this.hideResetConfirmationModal();
+            });
+        });
+
+        // Cancel button
+        const cancelBtn = document.getElementById('reset-cancel-btn');
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', () => {
+                this.hideResetConfirmationModal();
+            });
+        }
+
+        // Confirm reset button
+        const confirmBtn = document.getElementById('reset-confirm-btn');
+        if (confirmBtn) {
+            confirmBtn.addEventListener('click', () => {
+                this.executeReset();
+            });
+        }
+
+        // Close on backdrop click
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                this.hideResetConfirmationModal();
+            }
+        });
+
+        // Close on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+                this.hideResetConfirmationModal();
+            }
         });
     }
 
@@ -534,6 +589,114 @@ class UIManager {
      */
     getSectionsData() {
         return this.sectionsData;
+    }
+
+    /**
+     * Show reset confirmation modal
+     */
+    showResetConfirmationModal() {
+        const modal = document.getElementById('reset-confirmation-modal');
+        if (modal) {
+            modal.classList.remove('hidden');
+
+            // Focus the cancel button for accessibility
+            const cancelBtn = document.getElementById('reset-cancel-btn');
+            if (cancelBtn) {
+                setTimeout(() => cancelBtn.focus(), 100);
+            }
+        }
+    }
+
+    /**
+     * Hide reset confirmation modal
+     */
+    hideResetConfirmationModal() {
+        const modal = document.getElementById('reset-confirmation-modal');
+        if (modal) {
+            modal.classList.add('hidden');
+        }
+    }
+
+    /**
+     * Execute the complete application reset
+     */
+    async executeReset() {
+        const confirmBtn = document.getElementById('reset-confirm-btn');
+        const resetBtn = document.getElementById('reset-all-btn');
+
+        try {
+            // Disable buttons during reset
+            if (confirmBtn) {
+                confirmBtn.disabled = true;
+                confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Resetting...';
+            }
+            if (resetBtn) {
+                resetBtn.disabled = true;
+            }
+
+            // Hide the modal
+            this.hideResetConfirmationModal();
+
+            // Import managers dynamically to avoid circular dependencies
+            const { stateManager } = await import('./stateManager.js');
+            const { filterManager } = await import('./filterManager.js');
+
+            // Execute reset on all managers
+            const resetSuccess = stateManager.resetAllData();
+            filterManager.resetForApplicationReset();
+
+            // Clear parameter values but preserve definitions
+            if (typeof parameterComponents !== 'undefined') {
+                parameterComponents.clearAllParameters();
+            }
+
+            // Reset section UI states but preserve loaded parameters
+            if (typeof sectionComponents !== 'undefined') {
+                sectionComponents.resetAllSections();
+            }
+
+            // Preserve sectionsData but reset UI state
+            // Note: sectionsData contains the parameter definitions from Apple's API
+            // We should NOT clear this as it would remove all parameter definitions
+            this.currentState = UI_STATES.READY;
+
+            // Re-initialize filter controls and update UI state
+            setTimeout(() => {
+                filterManager.updateFilterControls();
+                filterManager.applyFilters();
+
+                // Ensure sections are still visible after reset
+                if (this.sectionsData && this.sectionsData.length > 0) {
+                    // Re-populate sections if they were cleared
+                    this.populateSections(this.sectionsData);
+                }
+
+                // Update export button state to reflect cleared parameters
+                this.updateExportButton();
+
+                // Update statistics display
+                this.updateStatistics();
+            }, 100);
+
+            if (resetSuccess) {
+                this.showNotification('All data has been reset successfully. The application has returned to its initial state.', 'success');
+            } else {
+                this.showNotification('Reset completed with some warnings. Please check the console for details.', 'warning');
+            }
+
+        } catch (error) {
+            console.error('Error during reset operation:', error);
+            this.showNotification('An error occurred during reset. Please refresh the page and try again.', 'error');
+        } finally {
+            // Re-enable buttons
+            if (confirmBtn) {
+                confirmBtn.disabled = false;
+                confirmBtn.innerHTML = '<i class="fas fa-undo"></i> Reset All';
+            }
+            if (resetBtn) {
+                resetBtn.disabled = false;
+            }
+        }
     }
 }
 
