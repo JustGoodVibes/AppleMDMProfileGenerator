@@ -150,7 +150,7 @@ jobs:
                   if (key === 'url' && typeof value === 'string' && value.includes('/documentation/devicemanagement/')) {
                     // Extract the filename from the URL path
                     const match = value.match(/\/documentation\/devicemanagement\/([^\/]+)$/);
-                    if (match && match[1] && match[1] !== 'profile-specific-payload-keys') {
+                    if (match && match[1] && match[1] !== 'profile-specific-payload-keys' && !match[1].includes('#')) {
                       urls.add(match[1] + '.json');
                     }
                   } else if (typeof value === 'object') {
