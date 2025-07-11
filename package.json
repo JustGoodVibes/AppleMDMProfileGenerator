@@ -32,7 +32,8 @@
     "test:cache-validation:coverage": "jest tests/unit/cacheComprehensiveValidation.test.js --coverage --verbose --testTimeout=30000",
     "test:cache-validation:runner": "node tests/run-cache-validation.js",
     "validate-cache": "node tests/run-cache-validation.js",
-    "validate-cache-files": "node tests/validate-cache-files.js"
+    "validate-cache-files": "node tests/validate-cache-files.js",
+    "debug-cache-loading": "node tests/debug-cache-loading.js"
   },
   "devDependencies": {
     "@babel/core": "^7.23.0",

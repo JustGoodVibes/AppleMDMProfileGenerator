@@ -686,11 +686,11 @@ class DataService {
      * Step 2: Parse TopicSections from profile-specific-payload-keys.json
      * Processes each topicSection array item to create main sections
      * @param {object} mainSpec - Main specification data
-     * @returns {Array} Array of section objects based on topicSections
+     * @returns {Promise<Array>} Array of section objects based on topicSections
      */
-    parseSections(mainSpec) {
+    async parseSections(mainSpec) {
         try {
-            progressService.log('Step 2: Parsing topicSections from profile-specific-payload-keys.json...', 'info');
+            progressService.log('Step 2: Parsing sections from profile-specific-payload-keys.json...', 'info');
             progressService.log(`Main spec structure: ${JSON.stringify(Object.keys(mainSpec), null, 2)}`, 'info');
 
             // Validate main spec structure
@@ -698,7 +698,18 @@ class DataService {
                 throw new Error('Invalid main specification structure for parsing');
             }
 
-            // Process each topicSection array item
+            // Cache-first approach: Try to load sections from available cache files first
+            if (configService.isCacheFirstMode()) {
+                progressService.log('Using cache-first approach: discovering sections from available cache files', 'info');
+                const cacheBasedSections = await this.parseSectionsFromCacheFiles(mainSpec);
+                if (cacheBasedSections.length > 0) {
+                    progressService.log(`Successfully parsed ${cacheBasedSections.length} sections from cache files`, 'success');
+                    return cacheBasedSections;
+                }
+            }
+
+            // Fallback to topicSections-based parsing
+            progressService.log('Falling back to topicSections-based parsing', 'info');
             const sections = this.processTopicSections(mainSpec.topicSections);
 
             // Validate and normalize all sections
@@ -718,6 +729,176 @@ class DataService {
             // Fallback to legacy parsing if section parsing fails
             return this.fallbackToLegacyParsing(mainSpec);
         }
+    }
+
+    /**
+     * Parse sections from available cache files
+     * Discovers all available cache files and creates sections from them
+     * @param {object} mainSpec - Main specification data for reference
+     * @returns {Promise<Array>} Array of section objects based on cache files
+     */
+    async parseSectionsFromCacheFiles(mainSpec) {
+        try {
+            progressService.log('Discovering sections from available cache files...', 'info');
+
+            // Get all available cache files
+            const availableFiles = await cacheFileService.getAvailableFiles();
+            progressService.log(`Found ${availableFiles.length} available cache files`, 'info');
+
+            if (availableFiles.length === 0) {
+                progressService.log('No cache files available, falling back to topicSections', 'warning');
+                return [];
+            }
+
+            const sections = [];
+
+            // Filter out the main specification file
+            const sectionFiles = availableFiles.filter(filename =>
+                filename !== 'profile-specific-payload-keys.json' &&
+                filename !== 'manifest.json'
+            );
+
+            progressService.log(`Processing ${sectionFiles.length} section files from cache`, 'info');
+
+            // Create sections from each cache file
+            for (const filename of sectionFiles) {
+                try {
+                    const section = await this.createSectionFromCacheFile(filename, mainSpec);
+                    if (section) {
+                        sections.push(section);
+                        progressService.log(`Created section: ${section.name} from ${filename}`, 'info');
+                    }
+                } catch (error) {
+                    progressService.log(`Error creating section from ${filename}: ${error.message}`, 'warning');
+                }
+            }
+
+            // Validate and normalize all sections
+            const validatedSections = sections.map((section, index) => {
+                return this.validateAndNormalizeSection(section, index);
+            });
+
+            progressService.log(`Successfully created ${validatedSections.length} sections from cache files`, 'success');
+            return validatedSections;
+
+        } catch (error) {
+            progressService.log(`Error parsing sections from cache files: ${error.message}`, 'error');
+            return [];
+        }
+    }
+
+    /**
+     * Create a section object from a cache file
+     * @param {string} filename - Cache file name
+     * @param {object} mainSpec - Main specification for reference
+     * @returns {Promise<object|null>} Section object or null if failed
+     */
+    async createSectionFromCacheFile(filename, mainSpec) {
+        try {
+            // Load the cache file data
+            const data = await cacheFileService.loadFile(filename);
+            if (!data) {
+                return null;
+            }
+
+            // Extract section name from filename
+            const sectionName = filename.replace('.json', '');
+            const displayName = this.createDisplayNameFromFilename(sectionName);
+
+            // Get section metadata
+            const metadata = this.getSectionMetadataFromData(data, sectionName);
+
+            // Create section object
+            const section = {
+                name: displayName,
+                identifier: sectionName,
+                description: metadata.description || data.abstract || '',
+                platforms: metadata.platforms || ['iOS', 'macOS', 'tvOS', 'watchOS'],
+                deprecated: metadata.deprecated || false,
+                parameters: [],
+                // Store the loaded data for parameter parsing
+                rawData: data,
+                // Mark as cache-based section
+                fromCache: true,
+                cacheFile: filename
+            };
+
+            return section;
+
+        } catch (error) {
+            progressService.log(`Error creating section from cache file ${filename}: ${error.message}`, 'warning');
+            return null;
+        }
+    }
+
+    /**
+     * Create display name from filename
+     * @param {string} filename - File name without extension
+     * @returns {string} Human-readable display name
+     */
+    createDisplayNameFromFilename(filename) {
+        // Handle special cases and known mappings
+        const knownMappings = {
+            'wifi': 'Wi-Fi',
+            'vpn': 'VPN',
+            'mdm': 'MDM',
+            'apn': 'APN',
+            'ldap': 'LDAP',
+            'scep': 'SCEP',
+            'toplevel': 'Top Level',
+            'airplay': 'AirPlay',
+            'appstore': 'App Store',
+            'caldav': 'CalDAV',
+            'carddav': 'CardDAV',
+            'exchangeactivesync': 'Exchange ActiveSync',
+            'exchangewebservices': 'Exchange Web Services',
+            'globalhttpproxy': 'Global HTTP Proxy',
+            'networkproxyconfiguration': 'Network Proxy Configuration',
+            'profileremovalpassword': 'Profile Removal Password',
+            'singlesignon': 'Single Sign-On',
+            'subscribedcalendars': 'Subscribed Calendars',
+            'timemachine': 'Time Machine',
+            'webcontentfilter': 'Web Content Filter'
+        };
+
+        if (knownMappings[filename.toLowerCase()]) {
+            return knownMappings[filename.toLowerCase()];
+        }
+
+        // Convert camelCase and handle common patterns
+        return filename
+            .replace(/([a-z])([A-Z])/g, '$1 $2') // camelCase to spaces
+            .replace(/([0-9])([a-z])/g, '$1 $2') // numbers followed by letters
+            .replace(/^./, str => str.toUpperCase()) // capitalize first letter
+            .replace(/\b\w/g, str => str.toUpperCase()); // capitalize each word
+    }
+
+    /**
+     * Get section metadata from loaded data
+     * @param {object} data - Loaded section data
+     * @param {string} sectionName - Section identifier
+     * @returns {object} Section metadata
+     */
+    getSectionMetadataFromData(data, sectionName) {
+        const metadata = {
+            description: '',
+            platforms: ['iOS', 'macOS', 'tvOS', 'watchOS'],
+            deprecated: false
+        };
+
+        // Extract metadata from the data structure
+        if (data.metadata) {
+            metadata.description = data.metadata.title || data.metadata.abstract || '';
+            metadata.platforms = data.metadata.platforms || metadata.platforms;
+            metadata.deprecated = data.metadata.deprecated || false;
+        }
+
+        // Fallback to top-level properties
+        if (!metadata.description && data.abstract) {
+            metadata.description = data.abstract;
+        }
+
+        return metadata;
     }
 
     /**
@@ -2727,7 +2908,7 @@ class DataService {
                 progressService.updateStatus('Parsing sections from specification...');
 
                 // Parse sections from main spec
-                const sections = this.parseSections(mainSpec);
+                const sections = await this.parseSections(mainSpec);
                 progressService.logParsingProgress('sections', sections.length);
 
                 if (sections.length === 0) {
@@ -2823,13 +3004,13 @@ class DataService {
 
     /**
      * Get cached data if available
-     * @returns {object|null} Cached data or null
+     * @returns {Promise<object|null>} Cached data or null
      */
-    getCachedData() {
+    async getCachedData() {
         const mainSpec = cacheService.get(CACHE_CONFIG.MAIN_SPEC_KEY);
         if (!mainSpec) return null;
 
-        const sections = this.parseSections(mainSpec);
+        const sections = await this.parseSections(mainSpec);
         const sectionsWithData = [];
 
         for (const section of sections) {

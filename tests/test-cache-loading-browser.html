@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cache Loading Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .warning { background-color: #fff3cd; color: #856404; }
+        .info { background-color: #d1ecf1; color: #0c5460; }
+        .section-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .section-item {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: #f9f9f9;
+        }
+        .section-name {
+            font-weight: bold;
+            color: #333;
+        }
+        .section-file {
+            font-size: 0.9em;
+            color: #666;
+        }
+        .section-params {
+            font-size: 0.8em;
+            color: #888;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 2s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Cache Loading Test</h1>
+        <p>This test verifies that the cache-first approach is working and loading all available cache files.</p>
+        
+        <div id="status"></div>
+        <div id="results"></div>
+        
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>Loading cache files...</p>
+        </div>
+    </div>
+
+    <script type="module">
+        import { dataService } from '../js/services/dataService.js';
+        import { cacheFileService } from '../js/services/cacheFileService.js';
+        import { configService } from '../js/services/configService.js';
+        import { progressService } from '../js/services/progressService.js';
+
+        const statusDiv = document.getElementById('status');
+        const resultsDiv = document.getElementById('results');
+        const loadingDiv = document.getElementById('loading');
+
+        function addStatus(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.textContent = message;
+            statusDiv.appendChild(div);
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        async function testCacheLoading() {
+            try {
+                addStatus('Starting cache loading test...', 'info');
+                
+                // Force cache-first mode
+                configService.set('USE_LIVE_API', false);
+                addStatus(`Cache-first mode: ${configService.isCacheFirstMode()}`, 'info');
+                
+                // Test 1: Check available cache files
+                addStatus('Testing cache file discovery...', 'info');
+                const availableFiles = await cacheFileService.getAvailableFiles();
+                addStatus(`Found ${availableFiles.length} available cache files`, 'success');
+                
+                // Test 2: Load main specification
+                addStatus('Loading main specification...', 'info');
+                const mainSpec = await dataService.loadMainSpec();
+                if (mainSpec) {
+                    addStatus('Main specification loaded successfully', 'success');
+                    addStatus(`TopicSections found: ${mainSpec.topicSections ? mainSpec.topicSections.length : 0}`, 'info');
+                } else {
+                    addStatus('Failed to load main specification', 'error');
+                    return;
+                }
+                
+                // Test 3: Parse sections using cache-first approach
+                addStatus('Parsing sections with cache-first approach...', 'info');
+                const sections = await dataService.parseSections(mainSpec);
+                addStatus(`Parsed ${sections.length} sections`, 'success');
+                
+                // Test 4: Load section data for each section
+                addStatus('Loading section data...', 'info');
+                const sectionsWithData = [];
+                let successCount = 0;
+                let errorCount = 0;
+                
+                for (const section of sections) {
+                    try {
+                        const sectionData = await dataService.loadSectionData(section.identifier);
+                        if (sectionData) {
+                            const parameters = dataService.parseParameters(sectionData, section.identifier);
+                            sectionsWithData.push({
+                                ...section,
+                                parameters,
+                                parameterCount: parameters.length,
+                                rawData: sectionData
+                            });
+                            successCount++;
+                        } else {
+                            errorCount++;
+                            addStatus(`No data found for section: ${section.name}`, 'warning');
+                        }
+                    } catch (error) {
+                        errorCount++;
+                        addStatus(`Error loading section ${section.name}: ${error.message}`, 'error');
+                    }
+                }
+                
+                addStatus(`Section loading complete: ${successCount} success, ${errorCount} errors`, 'info');
+                
+                // Display results
+                loadingDiv.style.display = 'none';
+                displayResults(sectionsWithData, availableFiles);
+                
+            } catch (error) {
+                addStatus(`Test failed: ${error.message}`, 'error');
+                console.error('Test error:', error);
+                loadingDiv.style.display = 'none';
+            }
+        }
+
+        function displayResults(sections, availableFiles) {
+            const totalParams = sections.reduce((sum, section) => sum + section.parameterCount, 0);
+            
+            resultsDiv.innerHTML = `
+                <h2>Test Results</h2>
+                <div class="status success">
+                    <strong>Cache Loading Summary:</strong><br>
+                    • Available cache files: ${availableFiles.length}<br>
+                    • Loaded sections: ${sections.length}<br>
+                    • Total parameters: ${totalParams}<br>
+                    • Cache-first mode: ${configService.isCacheFirstMode() ? 'Enabled' : 'Disabled'}
+                </div>
+                
+                <h3>Loaded Sections (${sections.length})</h3>
+                <div class="section-list">
+                    ${sections.map(section => `
+                        <div class="section-item">
+                            <div class="section-name">${section.name}</div>
+                            <div class="section-file">File: ${section.cacheFile || section.identifier + '.json'}</div>
+                            <div class="section-params">${section.parameterCount} parameters</div>
+                            ${section.fromCache ? '<div style="color: green; font-size: 0.8em;">✓ From cache</div>' : ''}
+                        </div>
+                    `).join('')}
+                </div>
+                
+                <h3>Available Cache Files (${availableFiles.length})</h3>
+                <div style="max-height: 300px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; background: #f9f9f9;">
+                    ${availableFiles.map(file => `<div style="font-family: monospace; font-size: 0.9em;">${file}</div>`).join('')}
+                </div>
+            `;
+        }
+
+        // Start the test
+        testCacheLoading();
+    </script>
+</body>
+</html>

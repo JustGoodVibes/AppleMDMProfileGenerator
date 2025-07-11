@@ -106,7 +106,7 @@ class App {
             // Try to load cached data first for faster startup
             if (!needsRefresh) {
                 progressService.updateStatus('Checking for cached data...');
-                const cachedData = dataService.getCachedData();
+                const cachedData = await dataService.getCachedData();
                 if (cachedData) {
                     progressService.log('Found valid cached data, loading...', 'success');
                     progressService.updateStatus('Loading from cache...');
@@ -155,7 +155,7 @@ class App {
 
             // Try to fall back to cached data
             progressService.updateStatus('Attempting to load cached data...');
-            const cachedData = dataService.getCachedData();
+            const cachedData = await dataService.getCachedData();
             if (cachedData) {
                 progressService.log('Falling back to cached data', 'warning');
                 uiManager.loadSectionsData(cachedData);
