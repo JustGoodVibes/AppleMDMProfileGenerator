@@ -2,6 +2,8 @@
 
 Create Apple Mobile Device Management (MDM) configuration profiles with an intuitive web interface. Automatically loads Apple's official MDM specifications and provides smart filtering, categorization, and export functionality.
 
+View site: https://justgoodvibes.github.io/AppleMDMProfileGenerator/
+
 ## Demo
 
 ![Apple MDM Profile Generator Demo](images/demo-placeholder.svg)
