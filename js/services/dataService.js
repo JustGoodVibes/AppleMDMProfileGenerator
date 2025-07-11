@@ -8,6 +8,8 @@ import { retryWithBackoff, getSectionMetadata } from '../utils/helpers.js';
 import { cacheService } from './cacheService.js';
 import { progressService } from './progressService.js';
 import { mockMainSpec, getMockSectionData, getMockSectionDataFuzzy } from './mockDataService.js';
+import { configService } from './configService.js';
+import { cacheFileService } from './cacheFileService.js';
 
 class DataService {
     constructor() {
@@ -15,6 +17,25 @@ class DataService {
         this.sectionData = new Map();
         this.isLoading = false;
         this.loadPromise = null;
+        this.cacheFileInitialized = false;
+
+        // Initialize cache file service
+        this.initializeCacheFileService();
+    }
+
+    /**
+     * Initialize the cache file service
+     */
+    async initializeCacheFileService() {
+        try {
+            this.cacheFileInitialized = await cacheFileService.initialize();
+            if (configService.isDebugMode()) {
+                console.log('Cache file service initialized:', this.cacheFileInitialized);
+            }
+        } catch (error) {
+            console.warn('Error initializing cache file service:', error);
+            this.cacheFileInitialized = false;
+        }
     }
 
     /**
@@ -24,9 +45,10 @@ class DataService {
      * @returns {Promise<object>} Parsed JSON response
      */
     async fetchWithRetry(url, options = {}) {
-        // Create abort controller for timeout
+        // Create abort controller for timeout using configured timeout
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+        const timeout = configService.getApiTimeout();
+        const timeoutId = setTimeout(() => controller.abort(), timeout);
 
         const defaultOptions = {
             method: 'GET',
@@ -102,16 +124,25 @@ class DataService {
     async loadMainSpec(forceRefresh = false) {
         const cacheKey = CACHE_CONFIG.MAIN_SPEC_KEY;
 
-        // Check cache first unless force refresh
+        // Check memory cache first unless force refresh
         if (!forceRefresh) {
             const cached = cacheService.get(cacheKey);
             if (cached && this.validateMainSpecStructure(cached)) {
-                progressService.logCacheOperation('hit', 'main specification');
+                progressService.logCacheOperation('hit', 'main specification (memory)');
                 this.mainSpec = cached;
                 return cached;
             } else {
-                progressService.logCacheOperation('miss', 'main specification');
+                progressService.logCacheOperation('miss', 'main specification (memory)');
             }
+        }
+
+        // Check if we should use live API or cache files only
+        const shouldUseLiveAPI = configService.shouldUseLiveAPI() && !forceRefresh;
+
+        if (!shouldUseLiveAPI) {
+            // Use cache files only
+            progressService.log('USE_LIVE_API=false, loading from cache files only', 'info');
+            return await this.loadMainSpecFromCache();
         }
 
         try {
@@ -149,12 +180,20 @@ class DataService {
             progressService.logDataFetch(API_ENDPOINTS.SECTION_BASE, 'error', { error: error.message });
             progressService.log(`Failed to load primary specification: ${error.message}`, 'error');
 
-            // Try to use cached data as fallback
+            // Try to use memory cached data as fallback
             const cached = cacheService.get(cacheKey);
             if (cached && this.validateMainSpecStructure(cached)) {
-                progressService.log('Using cached primary specification as fallback', 'warning');
+                progressService.log('Using memory cached primary specification as fallback', 'warning');
                 this.mainSpec = cached;
                 return cached;
+            }
+
+            // Try to use cache files as fallback
+            const cacheFileData = await this.loadMainSpecFromCache();
+            if (cacheFileData) {
+                progressService.log('Using cache file primary specification as fallback', 'warning');
+                this.mainSpec = cacheFileData;
+                return cacheFileData;
             }
 
             // Use mock data as last resort
@@ -162,6 +201,35 @@ class DataService {
             const mockData = mockMainSpec;
             this.mainSpec = mockData;
             return mockData;
+        }
+    }
+
+    /**
+     * Load main specification from cache files
+     * @returns {Promise<object|null>} Main specification data or null if not found
+     */
+    async loadMainSpecFromCache() {
+        try {
+            if (!this.cacheFileInitialized) {
+                await this.initializeCacheFileService();
+            }
+
+            const data = await cacheFileService.loadMainSpec();
+            if (data && this.validateMainSpecStructure(data)) {
+                progressService.logCacheOperation('hit', 'main specification (cache file)');
+
+                // Also cache in memory for faster subsequent access
+                const cacheKey = CACHE_CONFIG.MAIN_SPEC_KEY;
+                cacheService.set(cacheKey, data, CACHE_CONFIG.CACHE_DURATION);
+
+                return data;
+            } else {
+                progressService.logCacheOperation('miss', 'main specification (cache file)');
+                return null;
+            }
+        } catch (error) {
+            progressService.log(`Error loading main spec from cache files: ${error.message}`, 'error');
+            return null;
         }
     }
 
@@ -238,7 +306,7 @@ class DataService {
     async loadSectionData(sectionName, forceRefresh = false) {
         const cacheKey = `${CACHE_CONFIG.SECTION_KEY_PREFIX}${sectionName}`;
 
-        // Check cache first unless force refresh
+        // Check memory cache first unless force refresh
         if (!forceRefresh && this.sectionData.has(sectionName)) {
             progressService.logCacheOperation('hit', `section ${sectionName} (memory)`);
             return this.sectionData.get(sectionName);
@@ -247,12 +315,21 @@ class DataService {
         if (!forceRefresh) {
             const cached = cacheService.get(cacheKey);
             if (cached) {
-                progressService.logCacheOperation('hit', `section ${sectionName}`);
+                progressService.logCacheOperation('hit', `section ${sectionName} (localStorage)`);
                 this.sectionData.set(sectionName, cached);
                 return cached;
             } else {
-                progressService.logCacheOperation('miss', `section ${sectionName}`);
+                progressService.logCacheOperation('miss', `section ${sectionName} (localStorage)`);
             }
+        }
+
+        // Check if we should use live API or cache files only
+        const shouldUseLiveAPI = configService.shouldUseLiveAPI() && !forceRefresh;
+
+        if (!shouldUseLiveAPI) {
+            // Use cache files only
+            progressService.log(`USE_LIVE_API=false, loading section ${sectionName} from cache files only`, 'info');
+            return await this.loadSectionDataFromCache(sectionName);
         }
 
         try {
@@ -322,6 +399,14 @@ class DataService {
                 progressService.log(`Section ${sectionName} not found on Apple API (404), using fallback`, 'warning');
             }
 
+            // Try to use cache files as fallback
+            const cacheFileData = await this.loadSectionDataFromCache(sectionName);
+            if (cacheFileData) {
+                progressService.log(`Using cache file data for section: ${sectionName}`, 'warning');
+                this.sectionData.set(sectionName, cacheFileData);
+                return cacheFileData;
+            }
+
             // Try to use mock data as fallback (with fuzzy matching)
             let mockData = getMockSectionData(sectionName);
             if (!mockData) {
@@ -354,6 +439,61 @@ class DataService {
 
             // For other errors (network, timeout, etc.), still throw
             throw new Error(`${ERROR_MESSAGES.NETWORK_ERROR}: ${error.message}`);
+        }
+    }
+
+    /**
+     * Load section data from cache files
+     * @param {string} sectionName - Name of the section
+     * @returns {Promise<object|null>} Section data or null if not found
+     */
+    async loadSectionDataFromCache(sectionName) {
+        try {
+            if (!this.cacheFileInitialized) {
+                await this.initializeCacheFileService();
+            }
+
+            const data = await cacheFileService.loadSection(sectionName);
+            if (data) {
+                progressService.logCacheOperation('hit', `section ${sectionName} (cache file)`);
+
+                // Parse the section JSON according to specifications
+                const parsedSectionData = this.parseSectionJSON(data, sectionName);
+
+                // Merge topicSections from main specification if needed
+                if (!parsedSectionData.topicSections || parsedSectionData.topicSections.length === 0) {
+                    try {
+                        const mainSpec = await this.loadMainSpecFromCache();
+                        if (mainSpec) {
+                            const sectionDataFromMainSpec = this.extractSectionDataFromMainSpec(mainSpec, sectionName);
+
+                            if (sectionDataFromMainSpec.topicSections && sectionDataFromMainSpec.topicSections.length > 0) {
+                                parsedSectionData.topicSections = sectionDataFromMainSpec.topicSections;
+                                progressService.log(`Merged ${sectionDataFromMainSpec.topicSections.length} topicSections from cached main spec for ${sectionName}`, 'info');
+                            }
+                        }
+                    } catch (mainSpecError) {
+                        progressService.log(`Warning: Could not merge topicSections from cached main spec: ${mainSpecError.message}`, 'warning');
+                    }
+                }
+
+                // Cache in memory and localStorage for faster subsequent access
+                const cacheKey = `${CACHE_CONFIG.SECTION_KEY_PREFIX}${sectionName}`;
+                cacheService.set(cacheKey, parsedSectionData, CACHE_CONFIG.CACHE_DURATION);
+                this.sectionData.set(sectionName, parsedSectionData);
+
+                // Parse parameters for UI generation
+                const parameters = this.parseParameters(parsedSectionData, sectionName);
+                progressService.logSectionProgress(sectionName, 'success', { parameterCount: parameters.length });
+
+                return parsedSectionData;
+            } else {
+                progressService.logCacheOperation('miss', `section ${sectionName} (cache file)`);
+                return null;
+            }
+        } catch (error) {
+            progressService.log(`Error loading section ${sectionName} from cache files: ${error.message}`, 'error');
+            return null;
         }
     }
 

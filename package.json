@@ -19,7 +19,13 @@
     "test:reset-button": "jest tests/reset-button.test.js",
     "test:reset-button:coverage": "jest --coverage tests/reset-button.test.js",
     "test:reset-button:watch": "jest --watch tests/reset-button.test.js",
-    "test:regression": "jest --testNamePattern='regression|Regression'"
+    "test:regression": "jest --testNamePattern='regression|Regression'",
+    "test:cache": "jest --testPathPattern='cache|config'",
+    "test:cache:coverage": "jest --coverage --testPathPattern='cache|config'",
+    "test:cache:watch": "jest --watch --testPathPattern='cache|config'",
+    "test:config": "jest tests/unit/configService.test.js",
+    "test:cache-files": "jest tests/unit/cacheFileService.test.js",
+    "test:cache-integration": "jest tests/integration/cacheIntegration.test.js"
   },
   "devDependencies": {
     "@babel/core": "^7.23.0",
