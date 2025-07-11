@@ -16,6 +16,9 @@
     "test:missing-sections:coverage": "jest --coverage --testPathPattern='missing|firewall|darkMode'",
     "test:firewall": "jest tests/unit/firewallSection.test.js",
     "test:dark-mode": "jest tests/unit/darkModeCompatibility.test.js",
+    "test:reset-button": "jest tests/reset-button.test.js",
+    "test:reset-button:coverage": "jest --coverage tests/reset-button.test.js",
+    "test:reset-button:watch": "jest --watch tests/reset-button.test.js",
     "test:regression": "jest --testNamePattern='regression|Regression'"
   },
   "devDependencies": {
