@@ -4,7 +4,8 @@
   "description": "Apple MDM Profile Generator with hierarchical section support",
   "type": "module",
   "scripts": {
-    "test": "jest",
+    "test": "jest --testPathIgnore='tests/integration/cacheIntegration.test.js'",
+    "test:all": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "test:verbose": "jest --verbose",
@@ -20,9 +21,10 @@
     "test:reset-button:coverage": "jest --coverage tests/reset-button.test.js",
     "test:reset-button:watch": "jest --watch tests/reset-button.test.js",
     "test:regression": "jest --testNamePattern='regression|Regression'",
-    "test:cache": "jest --testPathPattern='cache|config'",
-    "test:cache:coverage": "jest --coverage --testPathPattern='cache|config'",
-    "test:cache:watch": "jest --watch --testPathPattern='cache|config'",
+    "test:cache": "jest tests/unit/configService.test.js tests/unit/cacheFileService.test.js tests/cache-system.test.js",
+    "test:cache:coverage": "jest --coverage tests/unit/configService.test.js tests/unit/cacheFileService.test.js tests/cache-system.test.js",
+    "test:cache:watch": "jest --watch tests/unit/configService.test.js tests/unit/cacheFileService.test.js tests/cache-system.test.js",
+    "test:cache:integration": "jest tests/integration/cacheIntegration.test.js --testTimeout=15000",
     "test:config": "jest tests/unit/configService.test.js",
     "test:cache-files": "jest tests/unit/cacheFileService.test.js",
     "test:cache-integration": "jest tests/integration/cacheIntegration.test.js"
