@@ -27,7 +27,12 @@
     "test:cache:integration": "jest tests/integration/cacheIntegration.test.js --testTimeout=15000",
     "test:config": "jest tests/unit/configService.test.js",
     "test:cache-files": "jest tests/unit/cacheFileService.test.js",
-    "test:cache-integration": "jest tests/integration/cacheIntegration.test.js"
+    "test:cache-integration": "jest tests/integration/cacheIntegration.test.js",
+    "test:cache-validation": "jest tests/unit/cacheComprehensiveValidation.test.js --verbose --testTimeout=30000",
+    "test:cache-validation:coverage": "jest tests/unit/cacheComprehensiveValidation.test.js --coverage --verbose --testTimeout=30000",
+    "test:cache-validation:runner": "node tests/run-cache-validation.js",
+    "validate-cache": "node tests/run-cache-validation.js",
+    "validate-cache-files": "node tests/validate-cache-files.js"
   },
   "devDependencies": {
     "@babel/core": "^7.23.0",
