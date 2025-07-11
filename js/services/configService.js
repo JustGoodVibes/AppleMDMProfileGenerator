@@ -8,8 +8,8 @@ import { CACHE_CONFIG } from '../utils/constants.js';
 class ConfigService {
     constructor() {
         this.config = {
-            // Default configuration values
-            USE_LIVE_API: true,
+            // Default configuration values - cache-first approach
+            USE_LIVE_API: false, // Default to cache-first for better performance
             CACHE_ENABLED: true,
             CACHE_DURATION: CACHE_CONFIG.CACHE_DURATION,
             DEBUG_MODE: false,
@@ -191,7 +191,7 @@ class ConfigService {
      */
     reset() {
         this.config = {
-            USE_LIVE_API: true,
+            USE_LIVE_API: false, // Default to cache-first for better performance
             CACHE_ENABLED: true,
             CACHE_DURATION: CACHE_CONFIG.CACHE_DURATION,
             DEBUG_MODE: false,
@@ -199,7 +199,7 @@ class ConfigService {
             RETRY_ATTEMPTS: 3,
             RETRY_DELAY: 1000
         };
-        
+
         this.saveToStorage();
         console.log('Configuration reset to defaults');
     }
@@ -217,7 +217,17 @@ class ConfigService {
      * @returns {boolean} True if live API should be used
      */
     shouldUseLiveAPI() {
-        return this.config.USE_LIVE_API && this.config.CACHE_ENABLED;
+        // Live API is only used when explicitly enabled by user
+        return this.config.USE_LIVE_API === true;
+    }
+
+    /**
+     * Check if cache-first mode is enabled (default behavior)
+     * @returns {boolean} True if cache-first mode is enabled
+     */
+    isCacheFirstMode() {
+        // Cache-first is the default behavior when live API is not explicitly enabled
+        return !this.config.USE_LIVE_API;
     }
 
     /**

@@ -136,14 +136,26 @@ class DataService {
             }
         }
 
-        // Check if we should use live API or cache files only
-        const shouldUseLiveAPI = configService.shouldUseLiveAPI() && !forceRefresh;
+        // Cache-first approach: Try cache files first, then live API if enabled
+        progressService.log('Using cache-first approach for better performance', 'info');
 
-        if (!shouldUseLiveAPI) {
-            // Use cache files only
-            progressService.log('USE_LIVE_API=false, loading from cache files only', 'info');
-            return await this.loadMainSpecFromCache();
+        // Try cache files first
+        const cacheFileData = await this.loadMainSpecFromCache();
+        if (cacheFileData) {
+            progressService.log('Successfully loaded main specification from cache files', 'success');
+            this.mainSpec = cacheFileData;
+            return cacheFileData;
         }
+
+        // If cache files failed and live API is disabled, stop here
+        const shouldUseLiveAPI = configService.shouldUseLiveAPI();
+        if (!shouldUseLiveAPI) {
+            progressService.log('Cache files unavailable and USE_LIVE_API=false, cannot load specification', 'error');
+            throw new Error('Cache files unavailable and live API disabled. Enable live API or ensure cache files are present.');
+        }
+
+        // Cache files failed but live API is enabled - proceed with live API
+        progressService.log('Cache files unavailable, falling back to live API (USE_LIVE_API=true)', 'warning');
 
         try {
             progressService.updateStatus('Fetching primary specification from Apple...');
@@ -323,14 +335,27 @@ class DataService {
             }
         }
 
-        // Check if we should use live API or cache files only
-        const shouldUseLiveAPI = configService.shouldUseLiveAPI() && !forceRefresh;
+        // Cache-first approach: Try cache files first, then live API if enabled
+        progressService.log(`Using cache-first approach for section ${sectionName}`, 'info');
 
-        if (!shouldUseLiveAPI) {
-            // Use cache files only
-            progressService.log(`USE_LIVE_API=false, loading section ${sectionName} from cache files only`, 'info');
-            return await this.loadSectionDataFromCache(sectionName);
+        // Try cache files first
+        const cacheFileData = await this.loadSectionDataFromCache(sectionName);
+        if (cacheFileData) {
+            progressService.log(`Successfully loaded section ${sectionName} from cache files`, 'success');
+            this.sectionData.set(sectionName, cacheFileData);
+            return cacheFileData;
         }
+
+        // If cache files failed and live API is disabled, stop here
+        const shouldUseLiveAPI = configService.shouldUseLiveAPI();
+        if (!shouldUseLiveAPI) {
+            progressService.log(`Cache files unavailable for section ${sectionName} and USE_LIVE_API=false`, 'warning');
+            // Return null to allow graceful degradation
+            return null;
+        }
+
+        // Cache files failed but live API is enabled - proceed with live API
+        progressService.log(`Cache files unavailable for section ${sectionName}, falling back to live API (USE_LIVE_API=true)`, 'warning');
 
         try {
             progressService.logSectionProgress(sectionName, 'start');

@@ -16,14 +16,15 @@ View site: https://justgoodvibes.github.io/AppleMDMProfileGenerator/
 
 ## Features
 
-✅ **Auto-loads Apple's official MDM specifications**  
-✅ **150+ configuration sections** with smart categorization  
-✅ **Priority-based filtering** (High/Medium/Low importance)   
-✅ **Real-time search** across all sections and parameters  
+✅ **Cache-first performance** - Fast loading from local cache by default
+✅ **Auto-loads Apple's official MDM specifications**
+✅ **150+ configuration sections** with smart categorization
+✅ **Priority-based filtering** (High/Medium/Low importance)
+✅ **Real-time search** across all sections and parameters
 ✅ **Export** ready-to-use .mobileconfig files (Can be imported into Fleet)
 ✅ **Accessibility compliant** with keyboard navigation  (Improvements welcome)
 ✅ **Automated cache system** with GitHub Actions for offline functionality
-✅ **Configurable API behavior** with live/cache fallback options
+✅ **Configurable API behavior** with optional live API enhancement
 
 ## Cache System & Configuration
 
@@ -40,7 +41,10 @@ You can control the application's behavior using URL parameters or localStorage:
 
 #### URL Parameters
 ```
-# Use cached files only (skip live API calls)
+# Enable live API calls (cache-first with live API fallback)
+?use_live_api=true
+
+# Use cached files only (skip live API calls) - DEFAULT BEHAVIOR
 ?use_live_api=false
 
 # Enable debug mode for detailed logging
@@ -54,8 +58,8 @@ You can control the application's behavior using URL parameters or localStorage:
 ```
 
 #### Configuration Modes
-- **`USE_LIVE_API=true`** (default): Try live Apple API first, fallback to cache if needed
-- **`USE_LIVE_API=false`**: Use cached files only, skip all live API calls
+- **`USE_LIVE_API=false`** (default): Cache-first approach - use cached files, faster performance
+- **`USE_LIVE_API=true`**: Cache-first with live API fallback - try cache first, then live API if needed
 
 ### Cache Status
 The cache is automatically maintained and includes:

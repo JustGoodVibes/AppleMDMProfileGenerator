@@ -147,16 +147,17 @@ The tests use Jest with the following configuration:
 
 ## Expected Behaviors
 
-### USE_LIVE_API=true (Default)
-1. Try live Apple API first
+### USE_LIVE_API=false (Default - Cache-First)
+1. Try cache files first
 2. Fallback to localStorage cache
-3. Fallback to cache files
-4. Fallback to mock data
-
-### USE_LIVE_API=false
-1. Skip live API calls
-2. Use cache files directly
 3. Fallback to mock data if cache files unavailable
+4. Skip live API calls entirely
+
+### USE_LIVE_API=true (Cache-First with Live API Fallback)
+1. Try cache files first
+2. Fallback to live Apple API if cache unavailable
+3. Fallback to localStorage cache
+4. Fallback to mock data
 
 ### Error Handling
 - Network errors should trigger fallback chain

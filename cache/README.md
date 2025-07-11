@@ -28,8 +28,8 @@ The cache is automatically updated by the GitHub Actions workflow (`.github/work
 ## Configuration
 
 The application behavior can be controlled via the `USE_LIVE_API` configuration parameter:
-- `USE_LIVE_API=true` (default): Try live API first, fallback to cache if needed
-- `USE_LIVE_API=false`: Use cached files only, skip live API calls
+- `USE_LIVE_API=false` (default): Cache-first approach - use cached files for better performance
+- `USE_LIVE_API=true`: Cache-first with live API fallback - try cache first, then live API if needed
 
 ## File Naming Convention
 
