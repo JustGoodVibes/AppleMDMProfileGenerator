@@ -1,0 +1,364 @@
+name: Cache Apple MDM Documentation
+
+on:
+  # Trigger on push to main branch
+  push:
+    branches: [ main ]
+
+  # Trigger on pull requests
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [ main ]
+  
+  # Scheduled runs - daily at 2 AM UTC
+  schedule:
+    - cron: '0 2 * * *'
+  
+  # Manual workflow dispatch
+  workflow_dispatch:
+    inputs:
+      force_refresh:
+        description: 'Force refresh all cached files'
+        required: false
+        default: 'false'
+        type: boolean
+
+permissions:
+  contents: write  # Required to commit and push changes
+  actions: read    # Required to read workflow information
+
+env:
+  CACHE_DIR: cache
+  BASE_URL: https://developer.apple.com/tutorials/data/documentation/devicemanagement
+
+jobs:
+  cache-apple-docs:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write
+      pull-requests: read
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        fetch-depth: 0
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Create cache directory
+      run: mkdir -p ${{ env.CACHE_DIR }}
+    
+    - name: Download Apple MDM Documentation
+      id: download
+      run: |
+        echo "Starting Apple MDM documentation download..."
+        
+        # Initialize counters
+        DOWNLOADED=0
+        UPDATED=0
+        FAILED=0
+        TOTAL=0
+        
+        # Function to download with retry logic
+        download_with_retry() {
+          local url="$1"
+          local output_file="$2"
+          local max_retries=3
+          local retry_delay=5
+          
+          for i in $(seq 1 $max_retries); do
+            echo "Attempting to download $url (attempt $i/$max_retries)..."
+            
+            if curl -L -f -s --connect-timeout 30 --max-time 120 \
+                    -H "User-Agent: AppleMDMProfileGenerator/1.0" \
+                    "$url" -o "$output_file"; then
+              echo "✅ Successfully downloaded: $(basename "$output_file")"
+              return 0
+            else
+              echo "❌ Failed to download $url (attempt $i/$max_retries)"
+              if [ $i -lt $max_retries ]; then
+                echo "Retrying in ${retry_delay} seconds..."
+                sleep $retry_delay
+                retry_delay=$((retry_delay * 2))  # Exponential backoff
+              fi
+            fi
+          done
+          
+          echo "❌ Failed to download $url after $max_retries attempts"
+          return 1
+        }
+        
+        # Function to calculate file checksum
+        calculate_checksum() {
+          local file="$1"
+          if [ -f "$file" ]; then
+            sha256sum "$file" | cut -d' ' -f1
+          else
+            echo ""
+          fi
+        }
+        
+        # Download main specification file first
+        echo "📥 Downloading main specification..."
+        MAIN_SPEC_URL="${{ env.BASE_URL }}/profile-specific-payload-keys.json"
+        MAIN_SPEC_FILE="${{ env.CACHE_DIR }}/profile-specific-payload-keys.json"
+        
+        # Check if file exists and get current checksum
+        OLD_CHECKSUM=""
+        if [ -f "$MAIN_SPEC_FILE" ]; then
+          OLD_CHECKSUM=$(calculate_checksum "$MAIN_SPEC_FILE")
+        fi
+        
+        if download_with_retry "$MAIN_SPEC_URL" "$MAIN_SPEC_FILE"; then
+          NEW_CHECKSUM=$(calculate_checksum "$MAIN_SPEC_FILE")
+          TOTAL=$((TOTAL + 1))
+          
+          if [ "$OLD_CHECKSUM" != "$NEW_CHECKSUM" ]; then
+            UPDATED=$((UPDATED + 1))
+            echo "📝 Main specification updated (checksum changed)"
+          else
+            echo "📝 Main specification unchanged"
+          fi
+          DOWNLOADED=$((DOWNLOADED + 1))
+        else
+          FAILED=$((FAILED + 1))
+          TOTAL=$((TOTAL + 1))
+          echo "❌ Failed to download main specification"
+          exit 1
+        fi
+
+        # Parse main specification to find all available sections
+        echo "🔍 Parsing main specification for available sections..."
+
+        # Extract section URLs from the main specification
+        SECTION_URLS=$(node -e "
+          const fs = require('fs');
+          try {
+            const data = JSON.parse(fs.readFileSync('$MAIN_SPEC_FILE', 'utf8'));
+            const urls = new Set();
+
+            // Function to recursively find URLs in the data structure
+            function findUrls(obj, path = '') {
+              if (typeof obj === 'object' && obj !== null) {
+                for (const [key, value] of Object.entries(obj)) {
+                  if (key === 'url' && typeof value === 'string' && value.includes('/documentation/devicemanagement/')) {
+                    // Extract the filename from the URL path
+                    const match = value.match(/\/documentation\/devicemanagement\/([^\/]+)$/);
+                    if (match && match[1] && match[1] !== 'profile-specific-payload-keys' && !match[1].includes('#')) {
+                      urls.add(match[1] + '.json');
+                    }
+                  } else if (typeof value === 'object') {
+                    findUrls(value, path + '.' + key);
+                  }
+                }
+              }
+            }
+
+            findUrls(data);
+            console.log(Array.from(urls).join(' '));
+          } catch (error) {
+            console.error('Error parsing main specification:', error.message);
+            process.exit(1);
+          }
+        ")
+
+        if [ -z "$SECTION_URLS" ]; then
+          echo "⚠️ No section URLs found in main specification"
+        else
+          echo "📋 Found sections: $SECTION_URLS"
+
+          # Download each section file
+          for SECTION_FILE in $SECTION_URLS; do
+            echo "📥 Downloading section: $SECTION_FILE"
+            SECTION_URL="${{ env.BASE_URL }}/$SECTION_FILE"
+            SECTION_PATH="${{ env.CACHE_DIR }}/$SECTION_FILE"
+
+            # Check if file exists and get current checksum
+            OLD_CHECKSUM=""
+            if [ -f "$SECTION_PATH" ]; then
+              OLD_CHECKSUM=$(calculate_checksum "$SECTION_PATH")
+            fi
+
+            TOTAL=$((TOTAL + 1))
+
+            if download_with_retry "$SECTION_URL" "$SECTION_PATH"; then
+              NEW_CHECKSUM=$(calculate_checksum "$SECTION_PATH")
+
+              if [ "$OLD_CHECKSUM" != "$NEW_CHECKSUM" ]; then
+                UPDATED=$((UPDATED + 1))
+                echo "📝 $SECTION_FILE updated (checksum changed)"
+              else
+                echo "📝 $SECTION_FILE unchanged"
+              fi
+              DOWNLOADED=$((DOWNLOADED + 1))
+            else
+              FAILED=$((FAILED + 1))
+              echo "❌ Failed to download $SECTION_FILE"
+            fi
+
+            # Rate limiting - wait 1 second between downloads
+            sleep 1
+          done
+        fi
+
+        # Create manifest file
+        echo "📋 Creating manifest file..."
+        MANIFEST_FILE="${{ env.CACHE_DIR }}/manifest.json"
+
+        node -e "
+          const fs = require('fs');
+          const path = require('path');
+          const crypto = require('crypto');
+
+          const cacheDir = '${{ env.CACHE_DIR }}';
+          const manifest = {
+            generated_at: new Date().toISOString(),
+            total_files: 0,
+            files: {}
+          };
+
+          // Function to calculate file checksum
+          function calculateChecksum(filePath) {
+            try {
+              const data = fs.readFileSync(filePath);
+              return crypto.createHash('sha256').update(data).digest('hex');
+            } catch (error) {
+              return null;
+            }
+          }
+
+          // Scan cache directory for JSON files
+          try {
+            const files = fs.readdirSync(cacheDir);
+            for (const file of files) {
+              if (file.endsWith('.json') && file !== 'manifest.json') {
+                const filePath = path.join(cacheDir, file);
+                const stats = fs.statSync(filePath);
+                const checksum = calculateChecksum(filePath);
+
+                manifest.files[file] = {
+                  size: stats.size,
+                  modified: stats.mtime.toISOString(),
+                  checksum: checksum
+                };
+                manifest.total_files++;
+              }
+            }
+
+            fs.writeFileSync('$MANIFEST_FILE', JSON.stringify(manifest, null, 2));
+            console.log('✅ Manifest created with', manifest.total_files, 'files');
+          } catch (error) {
+            console.error('❌ Error creating manifest:', error.message);
+            process.exit(1);
+          }
+        "
+
+        # Output summary
+        echo ""
+        echo "📊 Download Summary:"
+        echo "   Total files: $TOTAL"
+        echo "   Successfully downloaded: $DOWNLOADED"
+        echo "   Updated files: $UPDATED"
+        echo "   Failed downloads: $FAILED"
+
+        # Set outputs for next steps
+        echo "downloaded=$DOWNLOADED" >> $GITHUB_OUTPUT
+        echo "updated=$UPDATED" >> $GITHUB_OUTPUT
+        echo "failed=$FAILED" >> $GITHUB_OUTPUT
+        echo "total=$TOTAL" >> $GITHUB_OUTPUT
+
+        # Exit with error if any downloads failed
+        if [ $FAILED -gt 0 ]; then
+          echo "❌ Some downloads failed. Check the logs above."
+          exit 1
+        fi
+
+    - name: Check for changes
+      id: changes
+      run: |
+        # Add all files in cache directory to staging area first
+        git add ${{ env.CACHE_DIR }}/
+
+        # Check if there are any changes (both tracked and untracked files)
+        if git diff --quiet --cached; then
+          echo "No changes detected in cache directory"
+          echo "has_changes=false" >> $GITHUB_OUTPUT
+        else
+          echo "Changes detected in cache directory"
+          echo "has_changes=true" >> $GITHUB_OUTPUT
+
+          # Show what changed
+          echo "Changed files:"
+          git diff --name-only --cached
+
+          # Show summary of changes
+          echo "Summary:"
+          git diff --stat --cached
+        fi
+
+    - name: Commit and push changes
+      if: steps.changes.outputs.has_changes == 'true'
+      run: |
+        # Configure git
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+
+        # Create commit message
+        COMMIT_MSG="chore: update Apple MDM documentation cache"
+
+        if [ "${{ steps.download.outputs.updated }}" -gt 0 ]; then
+          COMMIT_MSG="$COMMIT_MSG - ${{ steps.download.outputs.updated }} files updated"
+        fi
+
+        if [ "${{ steps.download.outputs.downloaded }}" -gt "${{ steps.download.outputs.updated }}" ]; then
+          NEW_FILES=$((${{ steps.download.outputs.downloaded }} - ${{ steps.download.outputs.updated }}))
+          COMMIT_MSG="$COMMIT_MSG - $NEW_FILES new files"
+        fi
+
+        # Commit changes (files are already staged from the changes check step)
+        git commit -m "$COMMIT_MSG"
+
+        # Push changes
+        git push
+
+        echo "✅ Changes committed and pushed successfully"
+
+    - name: Create workflow summary
+      if: always()
+      run: |
+        echo "## Apple MDM Documentation Cache Update" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Summary" >> $GITHUB_STEP_SUMMARY
+        echo "- **Total files processed:** ${{ steps.download.outputs.total }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Successfully downloaded:** ${{ steps.download.outputs.downloaded }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Updated files:** ${{ steps.download.outputs.updated }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Failed downloads:** ${{ steps.download.outputs.failed }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Changes committed:** ${{ steps.changes.outputs.has_changes }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+
+        if [ -f "${{ env.CACHE_DIR }}/manifest.json" ]; then
+          echo "### Cached Files" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`json" >> $GITHUB_STEP_SUMMARY
+          cat "${{ env.CACHE_DIR }}/manifest.json" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+        fi
+
+    - name: Notify on failure
+      if: failure()
+      run: |
+        echo "❌ Workflow failed. Please check the logs for details."
+        echo "This could be due to:"
+        echo "- Network connectivity issues"
+        echo "- Apple API changes or downtime"
+        echo "- Repository permission issues"
+        echo "- File parsing errors"

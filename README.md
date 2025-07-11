@@ -1,5 +1,8 @@
 # Apple MDM Profile Generator
 
+[![Cache Apple MDM Documentation](https://github.com/JustGoodVibes/AppleMDMProfileGenerator/actions/workflows/cache-apple-docs.yml/badge.svg)](https://github.com/JustGoodVibes/AppleMDMProfileGenerator/actions/workflows/cache-apple-docs.yml)
+[![GitHub Pages](https://github.com/JustGoodVibes/AppleMDMProfileGenerator/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/JustGoodVibes/AppleMDMProfileGenerator/actions/workflows/pages/pages-build-deployment)
+
 Create Apple Mobile Device Management (MDM) configuration profiles with an intuitive web interface. Automatically loads Apple's official MDM specifications and provides smart filtering, categorization, and export functionality.
 
 View site: https://justgoodvibes.github.io/AppleMDMProfileGenerator/
@@ -17,8 +20,49 @@ View site: https://justgoodvibes.github.io/AppleMDMProfileGenerator/
 ✅ **150+ configuration sections** with smart categorization  
 ✅ **Priority-based filtering** (High/Medium/Low importance)   
 ✅ **Real-time search** across all sections and parameters  
-✅ **Export** ready-to-use .mobileconfig files (Can be imported into Fleet)  
-✅ **Accessibility compliant** with keyboard navigation  (Improvements welcome)  
+✅ **Export** ready-to-use .mobileconfig files (Can be imported into Fleet)
+✅ **Accessibility compliant** with keyboard navigation  (Improvements welcome)
+✅ **Automated cache system** with GitHub Actions for offline functionality
+✅ **Configurable API behavior** with live/cache fallback options
+
+## Cache System & Configuration
+
+This application features an automated cache system that ensures reliable access to Apple's MDM documentation:
+
+### Automatic Cache Updates
+- **Daily Updates**: GitHub Actions automatically downloads the latest Apple MDM documentation at 2 AM UTC
+- **Smart Caching**: Only updates files when content actually changes, using SHA-256 checksums
+- **Fallback Support**: Application works offline using cached files when Apple's API is unavailable
+
+### Configuration Options
+
+You can control the application's behavior using URL parameters or localStorage:
+
+#### URL Parameters
+```
+# Use cached files only (skip live API calls)
+?use_live_api=false
+
+# Enable debug mode for detailed logging
+?debug=true
+
+# Disable caching entirely
+?cache_enabled=false
+
+# Set API timeout (in milliseconds)
+?api_timeout=60000
+```
+
+#### Configuration Modes
+- **`USE_LIVE_API=true`** (default): Try live Apple API first, fallback to cache if needed
+- **`USE_LIVE_API=false`**: Use cached files only, skip all live API calls
+
+### Cache Status
+The cache is automatically maintained and includes:
+- Main specification file (`profile-specific-payload-keys.json`)
+- Individual section files (e.g., `accounts.json`, `wifi.json`)
+- Manifest file with checksums and timestamps
+- See the [cache directory](cache/) for current status
 
 ## Quick Start
 
@@ -47,6 +91,30 @@ Below is how to set up testing for development.
    - Browse sections in the sidebar
    - Use filters to find specific configurations
    - Configure parameters and export your profile
+
+## GitHub Actions Workflow
+
+The repository includes an automated workflow that maintains the cache of Apple MDM documentation:
+
+### Workflow Triggers
+- **Scheduled**: Daily at 2 AM UTC
+- **Push**: On commits to the main branch
+- **Pull Request**: On PR events (opened, synchronized, reopened)
+- **Manual**: Via workflow dispatch in the Actions tab
+
+### Manual Cache Refresh
+To manually refresh the cache:
+1. Go to the [Actions tab](https://github.com/JustGoodVibes/AppleMDMProfileGenerator/actions)
+2. Select "Cache Apple MDM Documentation"
+3. Click "Run workflow"
+4. Optionally enable "Force refresh all cached files"
+
+### Workflow Features
+- **Retry Logic**: Automatic retries with exponential backoff for failed downloads
+- **Rate Limiting**: Respectful delays between API calls to avoid overwhelming Apple's servers
+- **Change Detection**: Only commits when files are actually updated
+- **Integrity Checks**: SHA-256 checksums ensure file integrity
+- **Comprehensive Logging**: Detailed logs for troubleshooting
 
 ## How It Works
 
