@@ -1,0 +1,83 @@
+<svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#007AFF;stop-opacity:0.1" />
+      <stop offset="100%" style="stop-color:#007AFF;stop-opacity:0.05" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="800" height="400" fill="url(#bg)" stroke="#007AFF" stroke-width="2" rx="8"/>
+  
+  <!-- Header -->
+  <rect x="20" y="20" width="760" height="60" fill="#007AFF" rx="4"/>
+  <text x="40" y="45" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="white">🍎 Apple MDM Profile Generator</text>
+  <text x="40" y="65" font-family="Arial, sans-serif" font-size="12" fill="rgba(255,255,255,0.8)">Create configuration profiles for iOS, macOS, tvOS, and watchOS</text>
+  
+  <!-- Sidebar -->
+  <rect x="20" y="100" width="200" height="280" fill="white" stroke="#E5E5E7" rx="4"/>
+  <text x="30" y="120" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#1D1D1F">Configuration Sections</text>
+  
+  <!-- Section items -->
+  <rect x="30" y="135" width="180" height="25" fill="#F2F2F7" rx="2"/>
+  <circle cx="40" cy="147" r="3" fill="#FF3B30"/>
+  <text x="50" y="152" font-family="Arial, sans-serif" font-size="10" fill="#1D1D1F">🔒 Security Settings</text>
+  
+  <rect x="30" y="165" width="180" height="25" fill="#E3F2FD" rx="2"/>
+  <circle cx="40" cy="177" r="3" fill="#007AFF"/>
+  <text x="50" y="182" font-family="Arial, sans-serif" font-size="10" fill="#1D1D1F">🌐 Network Configuration</text>
+  
+  <rect x="30" y="195" width="180" height="25" fill="#F2F2F7" rx="2"/>
+  <circle cx="40" cy="207" r="3" fill="#FF9500"/>
+  <text x="50" y="212" font-family="Arial, sans-serif" font-size="10" fill="#1D1D1F">📱 App Management</text>
+  
+  <rect x="30" y="225" width="180" height="25" fill="#F2F2F7" rx="2"/>
+  <circle cx="40" cy="237" r="3" fill="#34C759"/>
+  <text x="50" y="242" font-family="Arial, sans-serif" font-size="10" fill="#1D1D1F">⚙️ System Settings</text>
+  
+  <!-- Main content area -->
+  <rect x="240" y="100" width="540" height="280" fill="white" stroke="#E5E5E7" rx="4"/>
+  
+  <!-- Filter bar -->
+  <rect x="250" y="110" width="520" height="40" fill="#F9F9F9" stroke="#E5E5E7" rx="2"/>
+  <rect x="260" y="120" width="200" height="20" fill="white" stroke="#D1D1D6" rx="2"/>
+  <text x="265" y="132" font-family="Arial, sans-serif" font-size="10" fill="#8E8E93">🔍 Search sections...</text>
+  
+  <rect x="480" y="120" width="80" height="20" fill="#007AFF" rx="2"/>
+  <text x="490" y="132" font-family="Arial, sans-serif" font-size="9" fill="white">Priority: All</text>
+  
+  <rect x="580" y="120" width="60" height="20" fill="#34C759" rx="2"/>
+  <text x="590" y="132" font-family="Arial, sans-serif" font-size="9" fill="white">Export</text>
+  
+  <!-- Content sections -->
+  <rect x="250" y="170" width="520" height="50" fill="#FAFAFA" stroke="#E5E5E7" rx="2"/>
+  <text x="260" y="185" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#1D1D1F">🔥 Firewall Configuration</text>
+  <rect x="260" y="190" width="40" height="15" fill="#FF3B30" rx="7"/>
+  <text x="265" y="200" font-family="Arial, sans-serif" font-size="8" fill="white">HIGH</text>
+  <rect x="310" y="190" width="50" height="15" fill="#007AFF" rx="7"/>
+  <text x="315" y="200" font-family="Arial, sans-serif" font-size="8" fill="white">SECURITY</text>
+  <text x="260" y="210" font-family="Arial, sans-serif" font-size="10" fill="#8E8E93">Configure firewall rules and network security settings</text>
+  
+  <rect x="250" y="230" width="520" height="50" fill="#FAFAFA" stroke="#E5E5E7" rx="2"/>
+  <text x="260" y="245" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#1D1D1F">📶 WiFi Settings</text>
+  <rect x="260" y="250" width="50" height="15" fill="#FF9500" rx="7"/>
+  <text x="265" y="260" font-family="Arial, sans-serif" font-size="8" fill="white">MEDIUM</text>
+  <rect x="320" y="250" width="50" height="15" fill="#34C759" rx="7"/>
+  <text x="325" y="260" font-family="Arial, sans-serif" font-size="8" fill="white">NETWORK</text>
+  <text x="260" y="270" font-family="Arial, sans-serif" font-size="10" fill="#8E8E93">Manage wireless network connections and authentication</text>
+  
+  <rect x="250" y="290" width="520" height="50" fill="#FAFAFA" stroke="#E5E5E7" rx="2"/>
+  <text x="260" y="305" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#1D1D1F">🏢 Accounts Configuration</text>
+  <rect x="260" y="310" width="40" height="15" fill="#FF3B30" rx="7"/>
+  <text x="265" y="320" font-family="Arial, sans-serif" font-size="8" fill="white">HIGH</text>
+  <rect x="310" y="310" width="35" height="15" fill="#8E8E93" rx="7"/>
+  <text x="315" y="320" font-family="Arial, sans-serif" font-size="8" fill="white">CORE</text>
+  <text x="260" y="330" font-family="Arial, sans-serif" font-size="10" fill="#8E8E93">Set up user accounts and authentication methods</text>
+  
+  <!-- Demo text overlay -->
+  <rect x="300" y="180" width="200" height="80" fill="rgba(0,122,255,0.9)" rx="8"/>
+  <text x="320" y="200" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="white">🎬 Demo Coming Soon</text>
+  <text x="310" y="220" font-family="Arial, sans-serif" font-size="11" fill="rgba(255,255,255,0.9)">Complete workflow:</text>
+  <text x="310" y="235" font-family="Arial, sans-serif" font-size="10" fill="rgba(255,255,255,0.8)">Load → Filter → Configure → Export</text>
+  <text x="310" y="250" font-family="Arial, sans-serif" font-size="10" fill="rgba(255,255,255,0.8)">See DEMO_CREATION_GUIDE.md</text>
+</svg>

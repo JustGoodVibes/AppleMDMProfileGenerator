@@ -1,105 +1,117 @@
 # Apple MDM Profile Generator
 
-A comprehensive web application for generating Apple Mobile Device Management (MDM) configuration profiles. This project dynamically loads Apple's official MDM specification and provides an intuitive interface for creating custom MDM profiles.
+Create Apple Mobile Device Management (MDM) configuration profiles with an intuitive web interface. Automatically loads Apple's official MDM specifications and provides smart filtering, categorization, and export functionality.
+
+## Demo
+
+![Apple MDM Profile Generator Demo](images/demo-placeholder.svg)
+*Interactive demo showing: Load specs → Filter sections → Configure parameters → Export profile*
+
+> 📹 **Creating the demo GIF?** See [Demo Creation Guide](docs/DEMO_CREATION_GUIDE.md) for detailed instructions.
 
 ## Features
 
-### Core Functionality
-- **Dynamic Data Loading**: Automatically fetches and parses Apple's official MDM specification from their API
-- **Comprehensive Section Coverage**: Supports all major MDM configuration areas including:
-  - Core system settings (Accounts, Restrictions, Top Level)
-  - Security & Privacy configurations (Firewall, VPN, Certificate Trust)
-  - Network settings (WiFi, DNS, Proxy)
-  - App Management (App Store, Managed App Configuration)
-  - Device settings (AirPrint, Bluetooth, Camera)
-  - Authentication services (Single Sign-On, Active Directory)
-  - UI customizations (Dock, Finder, Desktop)
+✅ **Auto-loads Apple's official MDM specifications**  
+✅ **150+ configuration sections** with smart categorization  
+✅ **Priority-based filtering** (High/Medium/Low importance)   
+✅ **Real-time search** across all sections and parameters  
+✅ **Export** ready-to-use .mobileconfig files (Can be imported into Fleet)  
+✅ **Accessibility compliant** with keyboard navigation  (Improvements welcome)  
 
-### Visual Enhancements
-- **Category and Priority Labels**: Each section displays colored badges showing:
-  - **Category**: Core, Security, Network, Apps, System, Authentication, Device, UI, Education
-  - **Priority**: High (🔴), Medium (🟡), Low (🟢) with appropriate color coding
-- **Hierarchical Section Structure**: Organized display matching Apple's official documentation
-- **Responsive Design**: Works seamlessly across desktop, tablet, and mobile devices
+## Quick Start
 
-### Advanced Filtering
-- **Search Functionality**: Real-time search across section names, descriptions, and parameters
-- **Priority-Based Filtering**: Filter sections by priority level (High/Medium/Low) with dropdown controls
-- **Platform Filtering**: Show/hide sections based on target platform (iOS, macOS, tvOS, watchOS)
-- **State Filtering**: Toggle between modified parameters, deprecated sections
-- **Filter Persistence**: All filter preferences saved to localStorage
+This is a pure HTML + JS implementation so any server that can serve a static website will work. 
 
-### User Experience
-- **Interactive Interface**: Expandable/collapsible sections with smooth animations
-- **Parameter Management**: Easy-to-use controls for configuring MDM parameters
-- **Export Functionality**: Generate and download .mobileconfig files
-- **Accessibility**: Full keyboard navigation and ARIA label support
-- **Dark Mode Ready**: CSS variables prepared for dark mode implementation
-
-## Technical Architecture
-
-### Modular Design
-- **Services**: Data fetching, caching, progress tracking, export functionality
-- **Managers**: UI state management, filtering, section management
-- **Components**: Reusable section and parameter components
-- **Utilities**: Helper functions, constants, validation
-
-### Data Processing
-- **API Integration**: Direct integration with Apple's official MDM specification API
-- **Intelligent Parsing**: Multiple parsing strategies with robust fallback mechanisms
-- **Missing Section Detection**: Automatically adds known MDM sections not present in API
-- **Hierarchical Processing**: Creates parent-child relationships between configuration sections
-
-### Testing
-- **Comprehensive Test Suite**: Unit tests for all major functionality
-- **Badge System Tests**: Verification of category and priority labeling
-- **Filter System Tests**: Complete testing of priority-based filtering
-- **Integration Tests**: End-to-end testing of data flow and UI interactions
-
-## Getting Started
-
-1. **Clone the repository**:
+Below is how to set up testing for development.
+1. **Clone and setup**:
    ```bash
    git clone https://github.com/JustGoodVibes/AppleMDMProfileGenerator.git
    cd AppleMDMProfileGenerator
-   ```
-
-2. **Install dependencies**:
-   ```bash
    npm install
    ```
 
-3. **Run tests**:
+2. **Run the application**:
    ```bash
-   npm test
+   # Option 1: Open directly in browser
+   open index.html
+
+   # Option 2: Use local server (recommended)
+   python3 -m http.server 8080
+   # Then visit http://localhost:8080
    ```
 
-4. **Open the application**:
-   Open `index.html` in a modern web browser or serve it using a local web server.
+3. **Start configuring**:
+   - Application auto-loads Apple's MDM specs
+   - Browse sections in the sidebar
+   - Use filters to find specific configurations
+   - Configure parameters and export your profile
 
-## Usage
+## How It Works
 
-1. **Load MDM Specifications**: The application automatically fetches Apple's latest MDM specification on startup
-2. **Browse Sections**: Use the sidebar navigation to explore different MDM configuration areas
-3. **Filter Content**: Use the priority dropdown and other filters to focus on specific sections
-4. **Configure Parameters**: Expand sections and modify parameters as needed
-5. **Export Profile**: Generate and download your custom .mobileconfig file
+1. 🔄 **Auto-loads** Apple's latest MDM specifications
+2. 🏷️ **Categorizes** 150+ sections by priority and type
+3. 🔍 **Filter & search** to find the configurations you need
+4. ⚙️ **Configure** parameters with user-friendly controls
+5. 📁 **Export** ready-to-deploy .mobileconfig files
 
-## Browser Compatibility
+📖 **Need help?** Check the [Quick Reference Guide](docs/QUICK_REFERENCE.md) for detailed usage instructions.
 
-- Chrome 90+
-- Firefox 88+
-- Safari 14+
-- Edge 90+
+## Supported Configurations
+
+<details>
+<summary><strong>📱 Platform Support</strong></summary>
+
+- **iOS** - iPhone and iPad device management
+- **macOS** - Mac computer configuration
+- **tvOS** - Apple TV settings
+- **watchOS** - Apple Watch management
+
+</details>
+
+<details>
+<summary><strong>🔧 Configuration Categories</strong></summary>
+
+- **Core System** - Accounts, Restrictions, Top Level settings
+- **Security & Privacy** - Firewall, VPN, Certificate Trust
+- **Network** - WiFi, DNS, Proxy configurations
+- **App Management** - App Store, Managed App Configuration
+- **Device Settings** - AirPrint, Bluetooth, Camera controls
+- **Authentication** - Single Sign-On, Active Directory
+- **UI Customization** - Dock, Finder, Desktop appearance
+
+</details>
+
+<details>
+<summary><strong>⚙️ Technical Architecture</strong></summary>
+
+**Modular Design:**
+- **Services** - Data fetching, caching, progress tracking, export
+- **Managers** - UI state, filtering, section management
+- **Components** - Reusable section and parameter components
+- **Utilities** - Helper functions, constants, validation
+
+**Data Processing:**
+- Direct integration with Apple's official MDM specification API
+- Intelligent parsing with robust fallback mechanisms
+- Automatic detection and addition of missing MDM sections
+- Hierarchical processing for parent-child section relationships
+
+**Testing:**
+- Comprehensive unit test suite for all functionality
+- Badge system and filter testing
+- End-to-end integration tests
+
+</details>
+
+---
+
+## Browser Support
+Chrome 90+ • Firefox 88+ • Safari 14+ • Edge 90+
 
 ## Contributing
+Contributions welcome! Please submit issues, feature requests, or pull requests.
 
-This project welcomes contributions! Please feel free to submit issues, feature requests, or pull requests.
+## License & Disclaimer
+Not affiliated with Apple Inc. Uses Apple's public MDM specification for educational purposes.
 
-## License
-
-This project is not affiliated with Apple Inc. It uses Apple's publicly available MDM specification for educational and development purposes.
-
-## Disclaimer
-
-This tool is provided as-is for educational and development purposes. Always test MDM profiles thoroughly in a development environment before deploying to production devices.
+⚠️ **Always test profiles in development before production deployment.**
