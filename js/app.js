@@ -1,412 +1,622 @@
 /**
+ * Apple MDM Profile Generator - Clean Rewrite
  * Main Application Entry Point
- * Initializes and coordinates all application components
  */
 
-import { UI_STATES, ERROR_MESSAGES, SUCCESS_MESSAGES } from './utils/constants.js';
-import { dataService } from './services/dataService.js';
-import { cacheService } from './services/cacheService.js';
-import { progressService } from './services/progressService.js';
-import { uiManager } from './managers/uiManager.js';
-import { filterManager } from './managers/filterManager.js';
-import { stateManager } from './managers/stateManager.js';
+// Application Configuration
+const CONFIG = {
+    USE_LIVE_API: false, // Cache-first approach as default
+    CACHE_DIR: './cache/',
+    API_BASE_URL: 'https://developer.apple.com/documentation/devicemanagement/',
+    MAX_LOAD_ATTEMPTS: 3,
+    LOAD_TIMEOUT: 30000
+};
 
-class App {
+// Application State
+class AppState {
     constructor() {
+        this.sections = new Map();
+        this.expandedSections = new Set();
+        this.modifiedParameters = new Map();
+        this.filters = {
+            search: '',
+            platform: [],
+            status: ''
+        };
+        this.isLoading = false;
         this.isInitialized = false;
-        this.loadAttempts = 0;
-        this.maxLoadAttempts = 3;
     }
 
-    /**
-     * Initialize the application
-     */
-    async initialize() {
+    // Section Management
+    addSection(section) {
+        this.sections.set(section.identifier, section);
+    }
+
+    getSection(identifier) {
+        return this.sections.get(identifier);
+    }
+
+    getAllSections() {
+        return Array.from(this.sections.values());
+    }
+
+    // Expansion State Management
+    expandSection(identifier) {
+        this.expandedSections.add(identifier);
+        this.notifyStateChange('sectionExpanded', { identifier });
+    }
+
+    collapseSection(identifier) {
+        this.expandedSections.delete(identifier);
+        this.notifyStateChange('sectionCollapsed', { identifier });
+    }
+
+    toggleSection(identifier) {
+        if (this.expandedSections.has(identifier)) {
+            this.collapseSection(identifier);
+        } else {
+            this.expandSection(identifier);
+        }
+    }
+
+    isSectionExpanded(identifier) {
+        return this.expandedSections.has(identifier);
+    }
+
+    // Parameter Management
+    setParameter(sectionId, parameterId, value) {
+        const key = `${sectionId}.${parameterId}`;
+        if (value === null || value === undefined || value === '') {
+            this.modifiedParameters.delete(key);
+        } else {
+            this.modifiedParameters.set(key, value);
+        }
+        this.notifyStateChange('parameterChanged', { sectionId, parameterId, value });
+    }
+
+    getParameter(sectionId, parameterId) {
+        const key = `${sectionId}.${parameterId}`;
+        return this.modifiedParameters.get(key);
+    }
+
+    getModifiedParametersCount() {
+        return this.modifiedParameters.size;
+    }
+
+    // Filter Management
+    setFilters(filters) {
+        this.filters = { ...this.filters, ...filters };
+        this.notifyStateChange('filtersChanged', this.filters);
+    }
+
+    // Reset
+    reset() {
+        this.expandedSections.clear();
+        this.modifiedParameters.clear();
+        this.filters = {
+            search: '',
+            platform: [],
+            status: ''
+        };
+        this.notifyStateChange('stateReset');
+    }
+
+    // Event System
+    notifyStateChange(type, data = {}) {
+        const event = new CustomEvent('appStateChange', {
+            detail: { type, data }
+        });
+        document.dispatchEvent(event);
+    }
+}
+
+// Data Service
+class DataService {
+    constructor() {
+        this.loadAttempts = 0;
+    }
+
+    async loadSections() {
+        this.loadAttempts++;
+        
+        try {
+            if (CONFIG.USE_LIVE_API) {
+                return await this.loadFromAPI();
+            } else {
+                return await this.loadFromCache();
+            }
+        } catch (error) {
+            console.error(`Load attempt ${this.loadAttempts} failed:`, error);
+            
+            if (this.loadAttempts < CONFIG.MAX_LOAD_ATTEMPTS) {
+                console.log(`Retrying... (${this.loadAttempts}/${CONFIG.MAX_LOAD_ATTEMPTS})`);
+                return await this.loadSections();
+            }
+            
+            throw error;
+        }
+    }
+
+    async loadFromCache() {
+        try {
+            // Load the manifest file to get list of available sections
+            const manifestResponse = await fetch(`${CONFIG.CACHE_DIR}manifest.json`);
+            if (!manifestResponse.ok) {
+                throw new Error(`Failed to load manifest.json: ${manifestResponse.status}`);
+            }
+
+            const manifest = await manifestResponse.json();
+            const fileNames = Object.keys(manifest.files).filter(name =>
+                name.endsWith('.json') && name !== 'manifest.json'
+            );
+
+            console.log(`Found ${fileNames.length} section files in cache`);
+
+            // Load all section files
+            const sections = [];
+            const loadPromises = fileNames.map(async (fileName) => {
+                try {
+                    const response = await fetch(`${CONFIG.CACHE_DIR}${fileName}`);
+                    if (response.ok) {
+                        const sectionData = await response.json();
+                        return sectionData;
+                    }
+                } catch (error) {
+                    console.warn(`Failed to load ${fileName}:`, error);
+                    return null;
+                }
+            });
+
+            const results = await Promise.all(loadPromises);
+            const validSections = results.filter(section => section !== null);
+
+            console.log(`Successfully loaded ${validSections.length} sections from cache`);
+            return this.processSectionsData(validSections);
+
+        } catch (error) {
+            console.error('Cache loading failed:', error);
+            throw new Error(`Failed to load from cache: ${error.message}`);
+        }
+    }
+
+    async loadFromAPI() {
+        // Placeholder for API loading
+        throw new Error('API loading not implemented in this version');
+    }
+
+    processSectionsData(sectionsArray) {
+        return sectionsArray.map((section, index) => {
+            // Handle Apple documentation format
+            const metadata = section.metadata || {};
+            const abstract = section.abstract || [];
+            const properties = this.extractProperties(section);
+
+            // Extract platforms from metadata
+            const platforms = metadata.platforms ?
+                metadata.platforms.map(p => p.name) : [];
+
+            // Extract description from abstract
+            const description = abstract.length > 0 ?
+                abstract.map(item => item.text || '').join(' ') : '';
+
+            // Create identifier from metadata or title
+            const title = metadata.title || metadata.navigatorTitle?.[0]?.text || `Section ${index + 1}`;
+            const identifier = title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+
+            return {
+                identifier,
+                name: title,
+                description,
+                platforms,
+                deprecated: Boolean(metadata.deprecated),
+                parameters: properties,
+                url: section.identifier?.url || '',
+                category: 'Device Management'
+            };
+        });
+    }
+
+    extractProperties(section) {
+        // Find properties section in primaryContentSections
+        const contentSections = section.primaryContentSections || [];
+        const propertiesSection = contentSections.find(s => s.kind === 'properties');
+
+        if (!propertiesSection || !propertiesSection.items) {
+            return [];
+        }
+
+        return propertiesSection.items.map(item => ({
+            key: item.name || 'unknown',
+            title: item.name || 'Unknown Parameter',
+            description: this.extractTextFromContent(item.content || []),
+            type: this.extractType(item.type || []),
+            required: Boolean(item.required),
+            defaultValue: this.extractDefaultValue(item.attributes || [])
+        }));
+    }
+
+    extractTextFromContent(content) {
+        if (!Array.isArray(content)) return '';
+
+        return content.map(item => {
+            if (item.type === 'paragraph' && item.inlineContent) {
+                return item.inlineContent.map(inline => inline.text || inline.code || '').join('');
+            }
+            return '';
+        }).join(' ').trim();
+    }
+
+    extractType(typeArray) {
+        if (!Array.isArray(typeArray)) return 'string';
+        return typeArray.map(t => t.text || t.kind || 'string').join(' ');
+    }
+
+    extractDefaultValue(attributes) {
+        if (!Array.isArray(attributes)) return null;
+        const defaultAttr = attributes.find(attr => attr.kind === 'default');
+        return defaultAttr ? defaultAttr.value : null;
+    }
+}
+
+// UI Manager
+class UIManager {
+    constructor(appState) {
+        this.appState = appState;
+        this.elements = {};
+        this.isInitialized = false;
+    }
+
+    initialize() {
         if (this.isInitialized) return;
         
-        try {
-            console.log('Initializing Apple MDM Profile Generator...');
+        this.cacheElements();
+        this.setupEventListeners();
+        this.isInitialized = true;
+        
+        console.log('UI Manager initialized');
+    }
 
-            // Initialize progress service first
-            progressService.initialize();
-            progressService.updateStatus('Initializing application...');
+    cacheElements() {
+        this.elements = {
+            loadingScreen: document.getElementById('loading-screen'),
+            loadingStatus: document.getElementById('loading-status'),
+            progressFill: document.getElementById('progress-fill'),
+            progressText: document.getElementById('progress-text'),
+            app: document.getElementById('app'),
+            searchInput: document.getElementById('search-input'),
+            clearSearch: document.getElementById('clear-search'),
+            platformFilter: document.getElementById('platform-filter'),
+            statusFilter: document.getElementById('status-filter'),
+            clearFilters: document.getElementById('clear-filters'),
+            navList: document.getElementById('nav-list'),
+            sectionsContainer: document.getElementById('sections-container'),
+            totalSections: document.getElementById('total-sections'),
+            modifiedCount: document.getElementById('modified-count'),
+            resetBtn: document.getElementById('reset-btn'),
+            exportBtn: document.getElementById('export-btn'),
+            collapseAll: document.getElementById('collapse-all'),
+            errorState: document.getElementById('error-state'),
+            emptyState: document.getElementById('empty-state'),
+            retryBtn: document.getElementById('retry-btn')
+        };
+    }
 
-            // Initialize managers
-            uiManager.initialize();
-            filterManager.initialize();
-            stateManager.initialize();
+    setupEventListeners() {
+        // App state changes
+        document.addEventListener('appStateChange', (e) => {
+            this.handleStateChange(e.detail);
+        });
 
-            progressService.log('Managers initialized successfully', 'success');
+        // Search
+        this.elements.searchInput?.addEventListener('input', (e) => {
+            this.handleSearch(e.target.value);
+        });
 
-            // Setup global event listeners
-            this.setupGlobalEventListeners();
+        this.elements.clearSearch?.addEventListener('click', () => {
+            this.clearSearch();
+        });
 
-            // Load data
-            await this.loadData();
+        // Filters
+        this.elements.platformFilter?.addEventListener('change', () => {
+            this.updateFilters();
+        });
 
-            this.isInitialized = true;
-            console.log('Application initialized successfully');
+        this.elements.statusFilter?.addEventListener('change', () => {
+            this.updateFilters();
+        });
 
-        } catch (error) {
-            console.error('Failed to initialize application:', error);
-            progressService.log(`Initialization failed: ${error.message}`, 'error');
-            this.handleInitializationError(error);
+        this.elements.clearFilters?.addEventListener('click', () => {
+            this.clearFilters();
+        });
+
+        // Actions
+        this.elements.resetBtn?.addEventListener('click', () => {
+            this.showResetConfirmation();
+        });
+
+        this.elements.exportBtn?.addEventListener('click', () => {
+            this.showExportModal();
+        });
+
+        this.elements.collapseAll?.addEventListener('click', () => {
+            this.collapseAllSections();
+        });
+
+        this.elements.retryBtn?.addEventListener('click', () => {
+            app.loadData();
+        });
+
+        // Section clicks (event delegation)
+        this.elements.sectionsContainer?.addEventListener('click', (e) => {
+            this.handleSectionClick(e);
+        });
+    }
+
+    // Loading States
+    showLoading(message = 'Loading...') {
+        this.updateLoadingStatus(message);
+        this.elements.loadingScreen?.classList.remove('hidden');
+        this.elements.app?.classList.add('hidden');
+    }
+
+    hideLoading() {
+        this.elements.loadingScreen?.classList.add('hidden');
+        this.elements.app?.classList.remove('hidden');
+    }
+
+    updateLoadingStatus(message) {
+        if (this.elements.loadingStatus) {
+            this.elements.loadingStatus.textContent = message;
         }
     }
 
-    /**
-     * Setup global event listeners
-     */
-    setupGlobalEventListeners() {
-        // Retry data load event
-        document.addEventListener('retryDataLoad', () => {
-            this.retryDataLoad();
-        });
-        
-        // Window resize for responsive adjustments
-        window.addEventListener('resize', () => {
-            this.handleWindowResize();
-        });
-        
-        // Online/offline status
-        window.addEventListener('online', () => {
-            this.handleOnlineStatus(true);
-        });
-        
-        window.addEventListener('offline', () => {
-            this.handleOnlineStatus(false);
-        });
-        
-        // Unhandled errors
-        window.addEventListener('error', (e) => {
-            this.handleGlobalError(e);
-        });
-        
-        // Unhandled promise rejections
-        window.addEventListener('unhandledrejection', (e) => {
-            this.handleGlobalError(e);
-        });
-    }
-
-    /**
-     * Load application data
-     */
-    async loadData() {
-        this.loadAttempts++;
-
-        try {
-            uiManager.setState(UI_STATES.LOADING);
-            progressService.reset(); // Reset progress for new load
-            progressService.updateStatus('Checking cache status...');
-
-            // Check if we need to refresh cache
-            const needsRefresh = dataService.needsRefresh();
-            progressService.log(`Cache refresh needed: ${needsRefresh}`, 'info');
-
-            // Try to load cached data first for faster startup
-            if (!needsRefresh) {
-                progressService.updateStatus('Checking for cached data...');
-                const cachedData = dataService.getCachedData();
-                if (cachedData) {
-                    progressService.log('Found valid cached data, loading...', 'success');
-                    progressService.updateStatus('Loading from cache...');
-
-                    uiManager.loadSectionsData(cachedData);
-
-                    // Restore UI state
-                    stateManager.restoreUIState();
-
-                    progressService.log('Cache data loaded successfully', 'success');
-
-                    // Still fetch fresh data in background if needed
-                    if (navigator.onLine) {
-                        progressService.log('Starting background refresh...', 'info');
-                        this.refreshDataInBackground();
-                    }
-
-                    return;
-                } else {
-                    progressService.log('No valid cached data found', 'warning');
-                }
-            }
-
-            // Load fresh data
-            progressService.updateStatus('Loading fresh data from Apple...');
-            progressService.log('Starting fresh data load from Apple servers', 'info');
-
-            const data = await dataService.loadAllData(needsRefresh);
-
-            progressService.updateStatus('Loading data into interface...');
-
-            // Load data into UI
-            uiManager.loadSectionsData(data);
-
-            // Restore UI state
-            stateManager.restoreUIState();
-
-            // Show success message if this was a retry
-            if (this.loadAttempts > 1) {
-                uiManager.showNotification(SUCCESS_MESSAGES.DATA_LOADED, 'success');
-            }
-
-        } catch (error) {
-            console.error('Failed to load data:', error);
-            progressService.log(`Data load failed: ${error.message}`, 'error');
-
-            // Try to fall back to cached data
-            progressService.updateStatus('Attempting to load cached data...');
-            const cachedData = dataService.getCachedData();
-            if (cachedData) {
-                progressService.log('Falling back to cached data', 'warning');
-                uiManager.loadSectionsData(cachedData);
-                stateManager.restoreUIState();
-
-                uiManager.showNotification(
-                    'Using cached data. Some information may be outdated.',
-                    'warning'
-                );
-                return;
-            }
-
-            // Show error state
-            progressService.log('No fallback data available', 'error');
-            this.handleDataLoadError(error);
+    updateProgress(percentage) {
+        if (this.elements.progressFill) {
+            this.elements.progressFill.style.width = `${percentage}%`;
+        }
+        if (this.elements.progressText) {
+            this.elements.progressText.textContent = `${Math.round(percentage)}%`;
         }
     }
 
-    /**
-     * Refresh data in background
-     */
-    async refreshDataInBackground() {
-        try {
-            console.log('Refreshing data in background...');
-            const data = await dataService.loadAllData(true);
-            
-            // Check if data has changed significantly
-            const currentSections = uiManager.getSectionsData();
-            if (this.hasDataChanged(currentSections, data.sections)) {
-                // Show notification about updated data
-                uiManager.showNotification(
-                    'Updated specifications available. Refresh to see changes.',
-                    'info'
-                );
-            }
-            
-        } catch (error) {
-            console.warn('Background refresh failed:', error);
-            // Don't show error for background refresh
+    // State Change Handlers
+    handleStateChange(detail) {
+        const { type, data } = detail;
+        
+        switch (type) {
+            case 'sectionExpanded':
+                this.updateSectionUI(data.identifier, true);
+                break;
+            case 'sectionCollapsed':
+                this.updateSectionUI(data.identifier, false);
+                break;
+            case 'parameterChanged':
+                this.updateParameterCount();
+                this.updateExportButton();
+                break;
+            case 'filtersChanged':
+                this.applyFilters();
+                break;
+            case 'stateReset':
+                this.resetUI();
+                break;
         }
     }
 
-    /**
-     * Check if data has changed significantly
-     * @param {Array} oldSections - Old sections data
-     * @param {Array} newSections - New sections data
-     * @returns {boolean} True if data has changed
-     */
-    hasDataChanged(oldSections, newSections) {
-        if (oldSections.length !== newSections.length) {
-            return true;
-        }
+    // Section Management
+    renderSections(sections) {
+        if (!this.elements.sectionsContainer) return;
         
-        // Simple check - compare section count and parameter counts
-        for (let i = 0; i < oldSections.length; i++) {
-            const oldSection = oldSections[i];
-            const newSection = newSections[i];
-            
-            if (oldSection.identifier !== newSection.identifier ||
-                oldSection.parameters?.length !== newSection.parameters?.length) {
-                return true;
-            }
-        }
+        this.elements.sectionsContainer.innerHTML = '';
         
-        return false;
+        sections.forEach(section => {
+            const sectionElement = this.createSectionElement(section);
+            this.elements.sectionsContainer.appendChild(sectionElement);
+        });
+
+        this.updateStats(sections.length);
     }
 
-    /**
-     * Handle data load error
-     * @param {Error} error - Error object
-     */
-    handleDataLoadError(error) {
-        let errorMessage = ERROR_MESSAGES.NETWORK_ERROR;
+    createSectionElement(section) {
+        const isExpanded = this.appState.isSectionExpanded(section.identifier);
         
-        if (error.message.includes('HTTP')) {
-            errorMessage = `Server error: ${error.message}`;
-        } else if (error.message.includes('JSON')) {
-            errorMessage = ERROR_MESSAGES.PARSE_ERROR;
-        } else if (!navigator.onLine) {
-            errorMessage = 'No internet connection. Please check your network and try again.';
-        }
+        const sectionEl = document.createElement('div');
+        sectionEl.className = 'section';
+        sectionEl.dataset.sectionId = section.identifier;
         
-        uiManager.setState(UI_STATES.ERROR, errorMessage);
-    }
-
-    /**
-     * Handle initialization error
-     * @param {Error} error - Error object
-     */
-    handleInitializationError(error) {
-        console.error('Initialization error:', error);
-        
-        // Show basic error message
-        document.body.innerHTML = `
-            <div style="display: flex; align-items: center; justify-content: center; height: 100vh; font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
-                <div style="text-align: center; max-width: 500px; padding: 2rem;">
-                    <h1 style="color: #FF3B30; margin-bottom: 1rem;">Application Error</h1>
-                    <p style="color: #666; margin-bottom: 2rem;">
-                        Failed to initialize the Apple MDM Profile Generator. 
-                        Please refresh the page and try again.
-                    </p>
-                    <button onclick="window.location.reload()" 
-                            style="background: #007AFF; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 0.5rem; cursor: pointer;">
-                        Refresh Page
+        sectionEl.innerHTML = `
+            <div class="section-header" data-action="toggle">
+                <div class="section-info">
+                    <h3 class="section-title">${this.escapeHtml(section.name)}</h3>
+                    <p class="section-description">${this.escapeHtml(section.description)}</p>
+                </div>
+                <div class="section-meta">
+                    <span class="parameter-count">${section.parameters.length} parameters</span>
+                    <button class="section-toggle" aria-label="${isExpanded ? 'Collapse' : 'Expand'} section">
+                        <i class="fas fa-chevron-${isExpanded ? 'up' : 'down'}"></i>
                     </button>
                 </div>
+            </div>
+            <div class="section-content ${isExpanded ? 'expanded' : ''}">
+                <div class="parameters-container" data-section-id="${section.identifier}">
+                    <!-- Parameters will be loaded here -->
+                </div>
+            </div>
+        `;
+        
+        return sectionEl;
+    }
+
+    // Event Handlers
+    handleSectionClick(e) {
+        const header = e.target.closest('.section-header[data-action="toggle"]');
+        if (!header) return;
+        
+        const section = header.closest('.section');
+        const sectionId = section?.dataset.sectionId;
+        
+        if (sectionId) {
+            this.appState.toggleSection(sectionId);
+        }
+    }
+
+    updateSectionUI(sectionId, isExpanded) {
+        const section = document.querySelector(`[data-section-id="${sectionId}"]`);
+        if (!section) return;
+        
+        const content = section.querySelector('.section-content');
+        const toggle = section.querySelector('.section-toggle i');
+        const button = section.querySelector('.section-toggle');
+        
+        if (content) {
+            content.classList.toggle('expanded', isExpanded);
+        }
+        
+        if (toggle) {
+            toggle.className = `fas fa-chevron-${isExpanded ? 'up' : 'down'}`;
+        }
+        
+        if (button) {
+            button.setAttribute('aria-label', `${isExpanded ? 'Collapse' : 'Expand'} section`);
+        }
+        
+        // Load parameters if expanding
+        if (isExpanded) {
+            this.loadSectionParameters(sectionId);
+        }
+    }
+
+    loadSectionParameters(sectionId) {
+        const section = this.appState.getSection(sectionId);
+        if (!section) return;
+        
+        const container = document.querySelector(`[data-section-id="${sectionId}"] .parameters-container`);
+        if (!container || container.dataset.loaded === 'true') return;
+        
+        // Create parameter elements
+        container.innerHTML = section.parameters.map(param => 
+            this.createParameterElement(param, sectionId)
+        ).join('');
+        
+        container.dataset.loaded = 'true';
+        console.log(`Loaded ${section.parameters.length} parameters for section ${sectionId}`);
+    }
+
+    createParameterElement(parameter, sectionId) {
+        // Simplified parameter element for now
+        return `
+            <div class="parameter" data-parameter-id="${parameter.key}">
+                <label class="parameter-label">
+                    ${this.escapeHtml(parameter.title || parameter.key)}
+                </label>
+                <input type="text" 
+                       class="parameter-input" 
+                       data-section-id="${sectionId}"
+                       data-parameter-id="${parameter.key}"
+                       placeholder="${this.escapeHtml(parameter.description || '')}"
+                       value="${this.appState.getParameter(sectionId, parameter.key) || ''}">
             </div>
         `;
     }
 
-    /**
-     * Retry data loading
-     */
-    async retryDataLoad() {
-        if (this.loadAttempts >= this.maxLoadAttempts) {
-            uiManager.showNotification(
-                'Maximum retry attempts reached. Please refresh the page.',
-                'error'
-            );
-            return;
+    // Utility Methods
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    updateStats(totalSections) {
+        if (this.elements.totalSections) {
+            this.elements.totalSections.textContent = totalSections;
         }
+    }
+
+    updateParameterCount() {
+        if (this.elements.modifiedCount) {
+            this.elements.modifiedCount.textContent = this.appState.getModifiedParametersCount();
+        }
+    }
+
+    updateExportButton() {
+        if (this.elements.exportBtn) {
+            this.elements.exportBtn.disabled = this.appState.getModifiedParametersCount() === 0;
+        }
+    }
+
+    // Placeholder methods for features to be implemented
+    handleSearch(query) { console.log('Search:', query); }
+    clearSearch() { console.log('Clear search'); }
+    updateFilters() { console.log('Update filters'); }
+    clearFilters() { console.log('Clear filters'); }
+    applyFilters() { console.log('Apply filters'); }
+    collapseAllSections() { console.log('Collapse all'); }
+    showResetConfirmation() { console.log('Show reset confirmation'); }
+    showExportModal() { console.log('Show export modal'); }
+    resetUI() { console.log('Reset UI'); }
+}
+
+// Main Application Class
+class App {
+    constructor() {
+        this.state = new AppState();
+        this.dataService = new DataService();
+        this.ui = new UIManager(this.state);
+    }
+
+    async initialize() {
+        console.log('Initializing Apple MDM Profile Generator...');
         
-        console.log(`Retrying data load (attempt ${this.loadAttempts + 1}/${this.maxLoadAttempts})...`);
+        this.ui.initialize();
         await this.loadData();
-    }
-
-    /**
-     * Handle window resize
-     */
-    handleWindowResize() {
-        // Debounce resize handling
-        clearTimeout(this.resizeTimeout);
-        this.resizeTimeout = setTimeout(() => {
-            // Handle responsive adjustments if needed
-            console.log('Window resized');
-        }, 250);
-    }
-
-    /**
-     * Handle online/offline status
-     * @param {boolean} isOnline - Online status
-     */
-    handleOnlineStatus(isOnline) {
-        if (isOnline) {
-            console.log('Connection restored');
-            uiManager.showNotification('Connection restored', 'success');
-            
-            // Try to refresh data if we're in error state
-            if (uiManager.getCurrentState() === UI_STATES.ERROR) {
-                this.retryDataLoad();
-            }
-        } else {
-            console.log('Connection lost');
-            uiManager.showNotification('Connection lost. Working offline.', 'warning');
-        }
-    }
-
-    /**
-     * Handle global errors
-     * @param {Event} event - Error event
-     */
-    handleGlobalError(event) {
-        console.error('Global error:', event);
         
-        // Don't show notifications for every error, just log them
-        // Only show critical errors that affect functionality
-        if (event.error && event.error.message.includes('ChunkLoadError')) {
-            uiManager.showNotification(
-                'Failed to load application resources. Please refresh the page.',
-                'error'
-            );
-        }
+        this.state.isInitialized = true;
+        console.log('Application initialized successfully');
     }
 
-    /**
-     * Get application status
-     * @returns {object} Application status
-     */
-    getStatus() {
-        return {
-            initialized: this.isInitialized,
-            loadAttempts: this.loadAttempts,
-            currentState: uiManager.getCurrentState(),
-            cacheStats: cacheService.getStats(),
-            stateStats: stateManager.getStateStats(),
-            filterStats: filterManager.getFilterStats()
-        };
-    }
-
-    /**
-     * Reset application to initial state
-     */
-    async reset() {
+    async loadData() {
         try {
-            console.log('Resetting application...');
+            this.ui.showLoading('Loading Apple MDM documentation...');
+            this.ui.updateProgress(10);
             
-            // Clear all data
-            dataService.clearCache();
-            stateManager.resetState();
-            filterManager.resetFilters();
+            const sections = await this.dataService.loadSections();
+            this.ui.updateProgress(70);
             
-            // Reinitialize
-            this.isInitialized = false;
-            this.loadAttempts = 0;
+            // Add sections to state
+            sections.forEach(section => {
+                this.state.addSection(section);
+            });
             
-            await this.initialize();
+            this.ui.updateProgress(90);
             
-            uiManager.showNotification('Application reset successfully', 'success');
+            // Render UI
+            this.ui.renderSections(sections);
+            this.ui.updateProgress(100);
+            
+            // Hide loading
+            setTimeout(() => {
+                this.ui.hideLoading();
+            }, 500);
             
         } catch (error) {
-            console.error('Failed to reset application:', error);
-            uiManager.showNotification('Failed to reset application', 'error');
-        }
-    }
-
-    /**
-     * Force refresh data
-     */
-    async forceRefresh() {
-        try {
-            console.log('Force refreshing data...');
-            
-            uiManager.setState(UI_STATES.LOADING);
-            
-            // Clear cache and reload
-            dataService.clearCache();
-            await this.loadData();
-            
-            uiManager.showNotification('Data refreshed successfully', 'success');
-            
-        } catch (error) {
-            console.error('Failed to refresh data:', error);
-            this.handleDataLoadError(error);
+            console.error('Failed to load data:', error);
+            this.ui.hideLoading();
+            // Show error state
         }
     }
 }
 
-// Create app instance
+// Initialize Application
 const app = new App();
 
-// Initialize when DOM is ready
+// Start the application when DOM is ready
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        app.initialize();
-    });
+    document.addEventListener('DOMContentLoaded', () => app.initialize());
 } else {
     app.initialize();
 }
 
 // Export for debugging
 window.app = app;
-
-// Export for module usage
-export default app;
+window.appState = app.state;
+window.uiManager = app.ui;
