@@ -76,7 +76,7 @@
                     <div class="filters">
                         <div class="filter-group">
                             <label>Platform</label>
-                            <select id="platform-filter" multiple>
+                            <select id="platform-filter">
                                 <option value="">All Platforms</option>
                                 <option value="iOS">iOS</option>
                                 <option value="macOS">macOS</option>
@@ -84,20 +84,31 @@
                                 <option value="watchOS">watchOS</option>
                             </select>
                         </div>
-                        
+
                         <div class="filter-group">
-                            <label>Status</label>
-                            <select id="status-filter">
-                                <option value="">All</option>
-                                <option value="modified">Modified</option>
-                                <option value="unmodified">Unmodified</option>
-                                <option value="deprecated">Deprecated</option>
-                            </select>
+                            <label>Show Only Modified</label>
+                            <div class="toggle-switch">
+                                <input type="checkbox" id="modified-only-toggle" class="toggle-input">
+                                <label for="modified-only-toggle" class="toggle-label">
+                                    <span class="toggle-slider"></span>
+                                    <span class="toggle-text">
+                                        <span class="toggle-on">ON</span>
+                                        <span class="toggle-off">OFF</span>
+                                    </span>
+                                </label>
+                            </div>
                         </div>
-                        
+
+                        <div class="search-results">
+                            <span id="search-results-count" class="results-count hidden">
+                                <i class="fas fa-search"></i>
+                                <span id="results-text">0 results</span>
+                            </span>
+                        </div>
+
                         <button id="clear-filters" class="btn btn-small">
-                            <i class="fas fa-filter"></i>
-                            Clear Filters
+                            <i class="fas fa-times"></i>
+                            Clear All
                         </button>
                     </div>
                 </div>
