@@ -524,42 +524,74 @@ class UIManager {
     updateSectionUI(sectionId, isExpanded) {
         const section = document.querySelector(`[data-section-id="${sectionId}"]`);
         if (!section) return;
-        
+
         const content = section.querySelector('.section-content');
         const toggle = section.querySelector('.section-toggle i');
         const button = section.querySelector('.section-toggle');
-        
+
         if (content) {
-            content.classList.toggle('expanded', isExpanded);
+            if (isExpanded) {
+                // Load parameters first if expanding
+                this.loadSectionParameters(sectionId);
+
+                // Use a more robust expansion approach
+                content.style.maxHeight = 'none';
+                content.style.overflow = 'visible';
+                content.classList.add('expanded');
+
+                // Ensure content is fully visible after a brief delay
+                setTimeout(() => {
+                    const actualHeight = content.scrollHeight;
+                    content.style.minHeight = `${actualHeight}px`;
+
+                    // Force a reflow to ensure proper rendering
+                    content.offsetHeight;
+                }, 50);
+            } else {
+                // Collapse with smooth transition
+                content.style.maxHeight = '0';
+                content.style.overflow = 'hidden';
+                content.style.minHeight = '0';
+                content.classList.remove('expanded');
+            }
         }
-        
+
         if (toggle) {
             toggle.className = `fas fa-chevron-${isExpanded ? 'up' : 'down'}`;
         }
-        
+
         if (button) {
             button.setAttribute('aria-label', `${isExpanded ? 'Collapse' : 'Expand'} section`);
-        }
-        
-        // Load parameters if expanding
-        if (isExpanded) {
-            this.loadSectionParameters(sectionId);
         }
     }
 
     loadSectionParameters(sectionId) {
         const section = this.appState.getSection(sectionId);
         if (!section) return;
-        
+
         const container = document.querySelector(`[data-section-id="${sectionId}"] .parameters-container`);
         if (!container || container.dataset.loaded === 'true') return;
-        
+
         // Create parameter elements
-        container.innerHTML = section.parameters.map(param => 
+        container.innerHTML = section.parameters.map(param =>
             this.createParameterElement(param, sectionId)
         ).join('');
-        
+
         container.dataset.loaded = 'true';
+
+        // Ensure container has proper sizing
+        container.style.minHeight = 'auto';
+        container.style.overflow = 'visible';
+
+        // Force layout recalculation
+        setTimeout(() => {
+            const sectionContent = container.closest('.section-content');
+            if (sectionContent && sectionContent.classList.contains('expanded')) {
+                const actualHeight = sectionContent.scrollHeight;
+                sectionContent.style.minHeight = `${actualHeight}px`;
+            }
+        }, 100);
+
         console.log(`Loaded ${section.parameters.length} parameters for section ${sectionId}`);
     }
 

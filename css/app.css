@@ -53,7 +53,7 @@
     /* Spacing */
     --spacing-xs: 0.25rem;
     --spacing-sm: 0.5rem;
-    --spacing-md: 1rem;
+    --spacing-md: 0.75rem;
     --spacing-lg: 1.5rem;
     --spacing-xl: 2rem;
     --spacing-2xl: 3rem;
@@ -694,13 +694,32 @@ body {
 .section-content {
     max-height: 0;
     overflow: hidden;
-    transition: max-height var(--transition-normal) ease-out;
+    transition: max-height var(--transition-normal) ease-out, opacity var(--transition-fast) ease-out;
     border-top: 1px solid var(--border-color);
+    opacity: 0;
+    visibility: hidden;
 }
 
 .section-content.expanded {
-    max-height: 2000px; /* Large enough value for content */
-    transition: max-height var(--transition-normal) ease-in;
+    max-height: none !important; /* Force unlimited height for full content visibility */
+    overflow: visible !important; /* Ensure content is never clipped */
+    opacity: 1;
+    visibility: visible;
+    transition: opacity var(--transition-fast) ease-in, visibility 0s ease-in;
+
+    /* Fallback for browsers that don't support max-height: none */
+    min-height: fit-content;
+    height: auto;
+}
+
+/* Ensure content container takes full available space */
+.section-content.expanded .parameters-container {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: var(--spacing-md) !important;
+    min-height: auto !important;
+    height: auto !important;
+    overflow: visible !important;
 }
 
 .parameters-container {
@@ -708,6 +727,10 @@ body {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-md);
+    min-height: auto;
+    overflow: visible;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 /* Parameter Styles */
@@ -720,11 +743,20 @@ body {
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
     transition: all var(--transition-fast);
+    min-height: auto;
+    overflow: visible;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: var(--spacing-sm);
 }
 
 .parameter:hover {
     border-color: var(--divider-color);
     box-shadow: var(--shadow-light);
+}
+
+.parameter:last-child {
+    margin-bottom: 0;
 }
 
 .parameter-header {
@@ -807,6 +839,10 @@ body {
     padding: var(--spacing-xs);
     border-radius: var(--border-radius);
     border: 1px solid var(--border-color);
+    min-height: auto;
+    overflow: visible;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .boolean-option {
@@ -852,6 +888,12 @@ body {
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
     margin-top: var(--spacing-xs);
+    min-height: auto;
+    overflow: visible;
+    width: 100%;
+    box-sizing: border-box;
+    word-wrap: break-word;
+    white-space: normal;
 }
 
 .parameter-description i {
