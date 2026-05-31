@@ -1,650 +1,650 @@
 {
-  "generated_at": "2026-05-29T06:15:40.661Z",
+  "generated_at": "2026-05-31T06:21:02.782Z",
   "total_files": 129,
   "files": {
     "8021xfirstactiveethernet.json": {
       "size": 13688,
-      "modified": "2026-05-29T06:13:40.907Z",
+      "modified": "2026-05-31T06:19:05.777Z",
       "checksum": "be51f3015e79c8854ea497c1e9823cd09ab36cc1e0b3286f0edd1427134ec7a7"
     },
     "8021xfirstethernet.json": {
       "size": 13438,
-      "modified": "2026-05-29T06:15:39.625Z",
+      "modified": "2026-05-31T06:21:01.747Z",
       "checksum": "5c49496b53e3b547850b565254aa666f4650283e4e0e7d99b3b9d76c3ad3081b"
     },
     "8021xglobalethernet.json": {
       "size": 14301,
-      "modified": "2026-05-29T06:15:21.244Z",
+      "modified": "2026-05-31T06:20:42.708Z",
       "checksum": "a9f270594b1843b6ba5791327093f97b197cd99b231dafb5415f31625a3839a3"
     },
     "8021xsecondactiveethernet.json": {
       "size": 13708,
-      "modified": "2026-05-29T06:13:16.758Z",
+      "modified": "2026-05-31T06:18:42.486Z",
       "checksum": "47ebe7babec6a7d9af15439e94d81a548ed3180aec84c3a542c6ea57cd3f2dc7"
     },
     "8021xsecondethernet.json": {
       "size": 13447,
-      "modified": "2026-05-29T06:14:34.055Z",
+      "modified": "2026-05-31T06:19:57.754Z",
       "checksum": "ef79bb8d25970726fe3472a63af3ca47bb2723a504b5933b642ad7de5aa72b31"
     },
     "8021xthirdactiveethernet.json": {
       "size": 13698,
-      "modified": "2026-05-29T06:13:49.378Z",
+      "modified": "2026-05-31T06:19:14.020Z",
       "checksum": "5f567cf67124d1c7c0a10fa894073edf0813d61d9c9754d5940334c79eb53c73"
     },
     "8021xthirdethernet.json": {
       "size": 13437,
-      "modified": "2026-05-29T06:15:19.870Z",
+      "modified": "2026-05-31T06:20:41.584Z",
       "checksum": "f04da6d72d0f1aaceafd28360655641ad3f520d874eee8ce95ccf7f4d68fc972"
     },
     "accessibility.json": {
       "size": 19142,
-      "modified": "2026-05-29T06:13:39.687Z",
+      "modified": "2026-05-31T06:19:04.653Z",
       "checksum": "bea8c43c2d89f026d70996a94157947dcdbee4ab3c430644042ffc222a2fcbae"
     },
     "accounts.json": {
       "size": 10309,
-      "modified": "2026-05-29T06:13:56.656Z",
+      "modified": "2026-05-31T06:19:21.184Z",
       "checksum": "25333e030850db4c14f78a478aaf80dae8eedb2f27c2a758b76c89458f6b1a6f"
     },
     "acmecertificate.json": {
       "size": 32161,
-      "modified": "2026-05-29T06:13:46.994Z",
+      "modified": "2026-05-31T06:19:11.755Z",
       "checksum": "cf74bf5b3f77ca6e60085c16eab443d7b8f85fc76ed957c0030625d715dee6df"
     },
     "activedirectorycertificate.json": {
       "size": 17989,
-      "modified": "2026-05-29T06:15:27.493Z",
+      "modified": "2026-05-31T06:20:49.083Z",
       "checksum": "ab95dc535c9e363d4041920874c5d4e3d74b9b1291e5415f43caec0df7630a77"
     },
     "aimaccount.json": {
       "size": 12825,
-      "modified": "2026-05-29T06:13:20.496Z",
+      "modified": "2026-05-31T06:18:45.960Z",
       "checksum": "3c01466d0108992371a344aa7ea604234b8ff58bc9ddffa50cdf1a0761d6d997"
     },
     "airplay.json": {
       "size": 10420,
-      "modified": "2026-05-29T06:15:12.661Z",
+      "modified": "2026-05-31T06:20:34.598Z",
       "checksum": "d9a389a353f310d334a6dc52214a59d979e3313bd3f20a9d54c4361201913ec4"
     },
     "airplaysecurity.json": {
       "size": 9384,
-      "modified": "2026-05-29T06:14:32.926Z",
+      "modified": "2026-05-31T06:19:56.571Z",
       "checksum": "09705d7fb0cf8a4d3ea480663dff7ed48982bb53b5533aa00af6dabc8dd3cea1"
     },
     "airprint.json": {
       "size": 8482,
-      "modified": "2026-05-29T06:14:12.478Z",
+      "modified": "2026-05-31T06:19:36.415Z",
       "checksum": "4b718dee5358253bd7f1a54f565ed34c50fcf48eeedb5c7afc941fc334903104"
     },
     "apn.json": {
       "size": 13175,
-      "modified": "2026-05-29T06:13:26.420Z",
+      "modified": "2026-05-31T06:18:51.930Z",
       "checksum": "af8774368c33a4cc2396ecf5230d6cf01890a0241f5e32fc9680a8bb9415f5af"
     },
     "applayervpn.json": {
       "size": 24580,
-      "modified": "2026-05-29T06:14:28.235Z",
+      "modified": "2026-05-31T06:19:51.659Z",
       "checksum": "4262c0f3144ba73810fcbbdacad4cbdc34465813ccde9643c0a0b94ba15d24d0"
     },
     "applock.json": {
       "size": 9708,
-      "modified": "2026-05-29T06:13:55.473Z",
+      "modified": "2026-05-31T06:19:19.894Z",
       "checksum": "146634f8488c1cd1a64dd20764286ae374cf462b1a1d17355fffed0d188c4422"
     },
     "appstore.json": {
       "size": 7851,
-      "modified": "2026-05-29T06:15:36.062Z",
+      "modified": "2026-05-31T06:20:58.014Z",
       "checksum": "72bd90eb81d79088f1136d8f13addaca8046f188cf0d230b59c1d94c2946525c"
     },
     "apptoapplayervpnmapping.json": {
       "size": 11854,
-      "modified": "2026-05-29T06:13:21.676Z",
+      "modified": "2026-05-31T06:18:47.097Z",
       "checksum": "7ca989bb78a87661fab039832237b5fe351128e856a5378bb05c58f3b4431b35"
     },
     "associateddomains.json": {
       "size": 10599,
-      "modified": "2026-05-29T06:15:37.279Z",
+      "modified": "2026-05-31T06:20:59.182Z",
       "checksum": "55f63f3f7fabb9dd1160d8d989419d59e9f8e9c8081a34e67e0494ca0b6a293c"
     },
     "autonomoussingleappmode.json": {
       "size": 10683,
-      "modified": "2026-05-29T06:15:22.477Z",
+      "modified": "2026-05-31T06:20:43.864Z",
       "checksum": "dc9bf1c3f2a1a67b6582816c1c542232a9c6ef9744c88722021d1d43c8560143"
     },
     "caldav.json": {
       "size": 12381,
-      "modified": "2026-05-29T06:14:30.561Z",
+      "modified": "2026-05-31T06:19:54.065Z",
       "checksum": "59a75a7decefa110ea6d07d4df242bad52ee329d691a6a54cc750949616e5280"
     },
     "carddav.json": {
       "size": 13721,
-      "modified": "2026-05-29T06:13:45.750Z",
+      "modified": "2026-05-31T06:19:10.565Z",
       "checksum": "b194e362e4a4fb845620e2737b5a6a1d3e13b047fe5b15491480ee8319b280df"
     },
     "cellular.json": {
       "size": 14163,
-      "modified": "2026-05-29T06:13:44.547Z",
+      "modified": "2026-05-31T06:19:09.443Z",
       "checksum": "68a36988be7041fa38b33e41d1e1dc28f62f37bdc2cb8daaf1805157794aa7a2"
     },
     "cellularprivatenetwork.json": {
       "size": 16389,
-      "modified": "2026-05-29T06:14:50.935Z",
+      "modified": "2026-05-31T06:20:14.128Z",
       "checksum": "ab2dea22f03808be32810b125921a70c4c6476937b904c022e14c4cffcaceffd"
     },
     "certificatepem.json": {
       "size": 15788,
-      "modified": "2026-05-29T06:14:49.728Z",
+      "modified": "2026-05-31T06:20:12.963Z",
       "checksum": "ab9d08b8ef0f2dbb7001c9b0fcc42d68cfb40960dfd7c4f15e6ac06d15867ff1"
     },
     "certificatepkcs1.json": {
       "size": 15318,
-      "modified": "2026-05-29T06:14:52.180Z",
+      "modified": "2026-05-31T06:20:15.284Z",
       "checksum": "25af451f75e9662b6c6759ec09b8c9783d4b78b7a131ddaa62c27d6a3fc6f5c5"
     },
     "certificatepkcs12.json": {
       "size": 20519,
-      "modified": "2026-05-29T06:14:03.885Z",
+      "modified": "2026-05-31T06:19:28.207Z",
       "checksum": "f085555ad64ec8086c9c6e8152c60e398ab85469210101ea057df599a4d6edcd"
     },
     "certificatepreference.json": {
       "size": 14851,
-      "modified": "2026-05-29T06:15:04.261Z",
+      "modified": "2026-05-31T06:20:26.684Z",
       "checksum": "b49a8017b6220280e98c7f1401415356c386fdaedc108ed04a78479141172ee4"
     },
     "certificaterevocation.json": {
       "size": 15115,
-      "modified": "2026-05-29T06:14:55.891Z",
+      "modified": "2026-05-31T06:20:18.718Z",
       "checksum": "59feaca8f1ae39eccea3ccb35b8570bce333ee7d9fe48708ab27760249bbbc2b"
     },
     "certificateroot.json": {
       "size": 16484,
-      "modified": "2026-05-29T06:15:26.223Z",
+      "modified": "2026-05-31T06:20:47.780Z",
       "checksum": "80e8686c178a3c82d6f443e034cbeb2db9f8d5a7df758d160baac4c505823667"
     },
     "certificatetransparency.json": {
       "size": 17958,
-      "modified": "2026-05-29T06:14:06.382Z",
+      "modified": "2026-05-31T06:19:30.517Z",
       "checksum": "269ca4a847d53784ce3d6a0b110e7aee231d76d5369fa30b4c8036d363971fef"
     },
     "commonpayloadkeys.json": {
       "size": 8751,
-      "modified": "2026-05-29T06:15:09.008Z",
+      "modified": "2026-05-31T06:20:31.186Z",
       "checksum": "6953ec809ebc08b444a5a675a6def74df7bbc64c844473ca23966aa088c15984"
     },
     "conferenceroomdisplay.json": {
       "size": 7073,
-      "modified": "2026-05-29T06:13:54.248Z",
+      "modified": "2026-05-31T06:19:18.759Z",
       "checksum": "57b02bd08cb09057a14bf73b2725fb4b2ab66c9e0b179fc44459d6c53980f45a"
     },
     "configuring-multiple-devices-using-profiles.json": {
       "size": 13302,
-      "modified": "2026-05-29T06:15:15.033Z",
+      "modified": "2026-05-31T06:20:36.858Z",
       "checksum": "402e187d84ece6368154ce2487ae3eae97ab9fa803e03ce3c680dbca882b19d6"
     },
     "contentcaching.json": {
       "size": 29461,
-      "modified": "2026-05-29T06:13:18.050Z",
+      "modified": "2026-05-31T06:18:43.623Z",
       "checksum": "a8cbe12206cb97f41e4ab8084f186b35a6145a931b6e6c6f7a2a9a0911052e27"
     },
     "declarations.json": {
       "size": 13893,
-      "modified": "2026-05-29T06:14:24.599Z",
+      "modified": "2026-05-31T06:19:48.004Z",
       "checksum": "e4572511387bc4411ad49c50c6ddc64ddb72aa6d0ac9a818fb27401cf5e960fb"
     },
     "desktop.json": {
       "size": 12121,
-      "modified": "2026-05-29T06:13:51.844Z",
+      "modified": "2026-05-31T06:19:16.292Z",
       "checksum": "4bfaaacf9b0b16e2fd0516bf009026b8b56cab3b88cf703b741769cc5f1094f5"
     },
     "directoryservice.json": {
       "size": 23004,
-      "modified": "2026-05-29T06:14:54.634Z",
+      "modified": "2026-05-31T06:20:17.559Z",
       "checksum": "68e54b3da38cfaf15bbed4d5e2695e32db603c08bf4bbd2a84d172e1a5a45cbb"
     },
     "dnsproxy.json": {
       "size": 10542,
-      "modified": "2026-05-29T06:14:40.110Z",
+      "modified": "2026-05-31T06:20:03.578Z",
       "checksum": "305d951f98da4e7128fcc7f903965dc814e883cae5b0cdda033c70dff893b3a9"
     },
     "dnssettings.json": {
       "size": 14106,
-      "modified": "2026-05-29T06:14:59.460Z",
+      "modified": "2026-05-31T06:20:22.106Z",
       "checksum": "a2504a0573be2eb91357df51d990a81496dee3ecb6d7b060395eba5a7644cabf"
     },
     "dock.json": {
       "size": 26235,
-      "modified": "2026-05-29T06:13:29.988Z",
+      "modified": "2026-05-31T06:18:55.376Z",
       "checksum": "0f8db1b6bd74b4311d64ca275f58c7b73930d04404e71e3832e9a53ac245ce10"
     },
     "domains.json": {
       "size": 19169,
-      "modified": "2026-05-29T06:13:42.041Z",
+      "modified": "2026-05-31T06:19:06.994Z",
       "checksum": "7f1a3353364559ea61fb06418e0c64ba11f03ae2537ee3861a5719fe73e7f629"
     },
     "educationconfiguration.json": {
       "size": 30012,
-      "modified": "2026-05-29T06:14:23.409Z",
+      "modified": "2026-05-31T06:19:46.879Z",
       "checksum": "4d3450b0e3d384dfd38dc8edde7821a5dda7fdbae9ae1e9d623e2018d1a34eec"
     },
     "energysaver.json": {
       "size": 20090,
-      "modified": "2026-05-29T06:13:36.017Z",
+      "modified": "2026-05-31T06:19:01.030Z",
       "checksum": "776fa9f0383caf030f9cf51647509d79a9bc765c98241f515631188979fd5588"
     },
     "exchangeactivesync.json": {
       "size": 31715,
-      "modified": "2026-05-29T06:13:57.886Z",
+      "modified": "2026-05-31T06:19:22.347Z",
       "checksum": "894d21444a4d1c7b70541062a04fce5549681c0c39eae66444b0d8a370baec2d"
     },
     "exchangewebservices.json": {
       "size": 13022,
-      "modified": "2026-05-29T06:14:00.210Z",
+      "modified": "2026-05-31T06:19:24.597Z",
       "checksum": "a927f0e4c50785c4be8fa941ee5bdead28b1b992c8f5fc6200b57e3bc927324f"
     },
     "extensiblesinglesignon.json": {
       "size": 21947,
-      "modified": "2026-05-29T06:13:15.522Z",
+      "modified": "2026-05-31T06:18:41.345Z",
       "checksum": "154ab267144cf656ed1c9dd1c1a7237740aaf2eb9e7d2f28cdea5b7e87ffc90a"
     },
     "extensiblesinglesignonkerberos.json": {
       "size": 14665,
-      "modified": "2026-05-29T06:15:00.661Z",
+      "modified": "2026-05-31T06:20:23.260Z",
       "checksum": "28ed966db9ee37fcf3534dbb19319ab4c7b61b1b49771ea8b10910166d7f4b39"
     },
     "fdefilevault.json": {
       "size": 15385,
-      "modified": "2026-05-29T06:14:36.523Z",
+      "modified": "2026-05-31T06:20:00.029Z",
       "checksum": "e1ff8b5b6838129a2bb06b9c3e236659a0b6e518b8f2d480d84523a53ceef84a"
     },
     "fdefilevaultoptions.json": {
       "size": 8307,
-      "modified": "2026-05-29T06:14:25.778Z",
+      "modified": "2026-05-31T06:19:49.176Z",
       "checksum": "50dda1ee7b7f7eee3b7dc66f09ab3772dd122c64cd5751bc0fc4d280ae6d7a60"
     },
     "fderecoverykeyescrow.json": {
       "size": 14669,
-      "modified": "2026-05-29T06:13:37.220Z",
+      "modified": "2026-05-31T06:19:02.358Z",
       "checksum": "db8f46b7b84bd756561ad8b564d6dc7ee4ed7593cd4988adeb3f0d9bfc4343a1"
     },
     "fderecoverykeyredirection.json": {
       "size": 12503,
-      "modified": "2026-05-29T06:14:17.433Z",
+      "modified": "2026-05-31T06:19:41.123Z",
       "checksum": "46e5888022f2468e372c55b008ca10d32631419592fa1ae8d2e91e90778f1f0a"
     },
     "fileprovider.json": {
       "size": 17409,
-      "modified": "2026-05-29T06:15:24.951Z",
+      "modified": "2026-05-31T06:20:46.473Z",
       "checksum": "a141a89566a75085e911947750ecea9a90079c7e0faf3deb80f47c1fcaff53c8"
     },
     "finder.json": {
       "size": 15233,
-      "modified": "2026-05-29T06:14:58.310Z",
+      "modified": "2026-05-31T06:20:20.990Z",
       "checksum": "5ae9d960ba5633ba0a32cce3e10b4be17e6ffa49e782b0b7a0dceaafe8971a8d"
     },
     "firewall.json": {
       "size": 15912,
-      "modified": "2026-05-29T06:14:08.868Z",
+      "modified": "2026-05-31T06:19:32.955Z",
       "checksum": "3abcc40fb7ac4125ad04ecf56d0f4873245631ac6857374cee0b2cc7f3b8846c"
     },
     "font.json": {
       "size": 12477,
-      "modified": "2026-05-29T06:14:41.341Z",
+      "modified": "2026-05-31T06:20:04.725Z",
       "checksum": "f71aa2f0c59e544ba04fdf126e693c0b7edb80e195dba2fe843f77587d3978eb"
     },
     "globalhttpproxy.json": {
       "size": 12575,
-      "modified": "2026-05-29T06:14:13.721Z",
+      "modified": "2026-05-31T06:19:37.545Z",
       "checksum": "fe5842238c455d8987647739c4437798cd2e91d77c745933d72f019e61837a87"
     },
     "globalpreferences.json": {
       "size": 7618,
-      "modified": "2026-05-29T06:13:19.227Z",
+      "modified": "2026-05-31T06:18:44.769Z",
       "checksum": "e9baed251ccc5c2ada48206b0ec205b8a5a6550a710e5907b105306b549d766b"
     },
     "googleaccount.json": {
       "size": 13241,
-      "modified": "2026-05-29T06:14:38.871Z",
+      "modified": "2026-05-31T06:20:02.426Z",
       "checksum": "ff80c7f99b25d9f43854ec0ac63852a68d6252a871c23cdd115af4dedeee655c"
     },
     "homescreenlayout.json": {
       "size": 19308,
-      "modified": "2026-05-29T06:14:46.110Z",
+      "modified": "2026-05-31T06:20:09.541Z",
       "checksum": "83d4bbc998dc1850648afa7062cd9116d34e7915c1fee9f80c73a49a154642b1"
     },
     "identification.json": {
       "size": 12501,
-      "modified": "2026-05-29T06:13:11.723Z",
+      "modified": "2026-05-31T06:18:37.735Z",
       "checksum": "32807855908aea1b59b7ff333a5593256a907e6f0870811e70761878de805107"
     },
     "identitypreference.json": {
       "size": 19947,
-      "modified": "2026-05-29T06:13:38.389Z",
+      "modified": "2026-05-31T06:19:03.491Z",
       "checksum": "ae1315f92b964253e5e8774bf463dc7b34c48e6503488795c7e5a2c4ea749e71"
     },
     "jabberaccount.json": {
       "size": 12789,
-      "modified": "2026-05-29T06:14:57.112Z",
+      "modified": "2026-05-31T06:20:19.868Z",
       "checksum": "77899ed9313ffb5b51bbc3e74bc30cdfca4504f27da5f95662f0ef1dc8cb04e6"
     },
     "ldap.json": {
       "size": 13508,
-      "modified": "2026-05-29T06:13:33.608Z",
+      "modified": "2026-05-31T06:18:58.739Z",
       "checksum": "09ace48cf7959d929ab0c9c465cddced432ef74655396e179601d1eb23a3ce2d"
     },
     "lightsoutmanagementlom.json": {
       "size": 25814,
-      "modified": "2026-05-29T06:15:11.487Z",
+      "modified": "2026-05-31T06:20:33.475Z",
       "checksum": "464deea4e27b9a55db01ead5dacaad3c4fb2c4d1c5bf03f6c2c1220947dca401"
     },
     "lockscreenmessage.json": {
       "size": 12279,
-      "modified": "2026-05-29T06:13:22.899Z",
+      "modified": "2026-05-31T06:18:48.210Z",
       "checksum": "9b30209a15d4c9e4537ce8bf78d2dbc30a34e6c1caf524673b23f3796383b59c"
     },
     "loginitemsmanageditems.json": {
       "size": 10453,
-      "modified": "2026-05-29T06:14:43.693Z",
+      "modified": "2026-05-31T06:20:07.258Z",
       "checksum": "a19ddc2e9a2113b54985c8b7b45a04b7ab1ec01576fbd27f6fece860723695df"
     },
     "loginwindow.json": {
       "size": 19360,
-      "modified": "2026-05-29T06:14:01.496Z",
+      "modified": "2026-05-31T06:19:25.910Z",
       "checksum": "44fbf484d5f3c8b23ea380167db2baa18e03ce9a61b855638b1c953aea47c98c"
     },
     "loginwindowloginitems.json": {
       "size": 9164,
-      "modified": "2026-05-29T06:14:07.642Z",
+      "modified": "2026-05-31T06:19:31.634Z",
       "checksum": "6c5fdd40e2d4a62c4bdc25e68f401ef6714d6d7da98f09e16affaa0ccbca0d4c"
     },
     "loginwindowscripts.json": {
       "size": 12840,
-      "modified": "2026-05-29T06:13:27.596Z",
+      "modified": "2026-05-31T06:18:53.100Z",
       "checksum": "001d37cb404a7971ddd7ad191bfe68341936ed373db314210d967178e35aec8d"
     },
     "macosserveraccount.json": {
       "size": 13470,
-      "modified": "2026-05-29T06:13:10.547Z",
+      "modified": "2026-05-31T06:18:36.614Z",
       "checksum": "8325296c1644ffc3478da250958e97c4a252ce971bf65a75b97fdde07172f900"
     },
     "mail.json": {
       "size": 22610,
-      "modified": "2026-05-29T06:13:28.776Z",
+      "modified": "2026-05-31T06:18:54.237Z",
       "checksum": "f6649fc6446735b496ff628446d741fe92d16a832f9044a85c2a44b3850d3579"
     },
     "managedmenuextras.json": {
       "size": 20102,
-      "modified": "2026-05-29T06:14:53.343Z",
+      "modified": "2026-05-31T06:20:16.420Z",
       "checksum": "b89dbf9aeb6627e624066f829af68a026307c88a4bae63e5eed40a4865930cdf"
     },
     "managedpreferences.json": {
       "size": 11932,
-      "modified": "2026-05-29T06:13:25.245Z",
+      "modified": "2026-05-31T06:18:50.808Z",
       "checksum": "97dface98757f20545a2c254401a85709e97f25d5d7e674cf325c35c9ef4beaa"
     },
     "mdm.json": {
       "size": 36576,
-      "modified": "2026-05-29T06:15:23.769Z",
+      "modified": "2026-05-31T06:20:45.169Z",
       "checksum": "5ba6f3e1131ca0a2c59981309f51c546e393924b8a016ad70bf150626afee114"
     },
     "mediamanagementallowedmedia.json": {
       "size": 15372,
-      "modified": "2026-05-29T06:14:10.114Z",
+      "modified": "2026-05-31T06:19:34.075Z",
       "checksum": "8e43241d7e4985c471cd68fc4570ad23df866c1eecf9cbaa77b527238392980b"
     },
     "mediamanagementdiscburning.json": {
       "size": 7730,
-      "modified": "2026-05-29T06:15:38.442Z",
+      "modified": "2026-05-31T06:21:00.467Z",
       "checksum": "7352c64b1a5adc0d4ac4e043768122d8436bfd452a93616f8bbd679886446aa4"
     },
     "mobileaccounts.json": {
       "size": 12016,
-      "modified": "2026-05-29T06:15:06.705Z",
+      "modified": "2026-05-31T06:20:28.948Z",
       "checksum": "d7c7e71406fbb11cafb43e8d49dbceb45cc2970654ca21f8b5379d27ef11f4b2"
     },
     "networkproxyconfiguration.json": {
       "size": 9153,
-      "modified": "2026-05-29T06:13:09.312Z",
+      "modified": "2026-05-31T06:18:35.495Z",
       "checksum": "1c7df4060de2ba5b8d267e5016f056f52b1844d1073bf8bd7aedde95e53ff07d"
     },
     "networkusagerules.json": {
       "size": 14997,
-      "modified": "2026-05-29T06:13:48.152Z",
+      "modified": "2026-05-31T06:19:12.873Z",
       "checksum": "69e9ca3307a7e95075a6639f00a74537d3c1562dc33afedda6fc59981ef93986"
     },
     "notifications.json": {
       "size": 13450,
-      "modified": "2026-05-29T06:14:05.109Z",
+      "modified": "2026-05-31T06:19:29.385Z",
       "checksum": "641ed252c5428177d1c7952b29a5b10109a9f127eb164e6e9ccb5f66178867dc"
     },
     "nsextensionmanagement.json": {
       "size": 10128,
-      "modified": "2026-05-29T06:15:18.649Z",
+      "modified": "2026-05-31T06:20:40.406Z",
       "checksum": "10017a34da5f20c84ce3b0913e50f5aee0bb77952ace34da3169b846012d2b80"
     },
     "parentalcontroldictationandprofanity.json": {
       "size": 11863,
-      "modified": "2026-05-29T06:13:06.809Z",
+      "modified": "2026-05-31T06:18:33.214Z",
       "checksum": "8784b7f5896572340c0646abb6a3b1dc5dc7b7fcda54374da008ac78e8d16688"
     },
     "parentalcontrolsapplicationrestrictions.json": {
       "size": 14053,
-      "modified": "2026-05-29T06:15:02.994Z",
+      "modified": "2026-05-31T06:20:25.557Z",
       "checksum": "58f30743f9ba88cbb979d52098935fb399b212d15f4e1404dcfe4485e17f2c7b"
     },
     "parentalcontrolscontentfilter.json": {
       "size": 16244,
-      "modified": "2026-05-29T06:13:13.009Z",
+      "modified": "2026-05-31T06:18:38.894Z",
       "checksum": "64eb569709ecb5005c307b7f86db9047719cec01d646e749aebe778441edf926"
     },
     "parentalcontrolsdashboardwidgetrestrictions.json": {
       "size": 12889,
-      "modified": "2026-05-29T06:14:11.250Z",
+      "modified": "2026-05-31T06:19:35.247Z",
       "checksum": "f6617aa7dcb4995dfebcfcc19802279bb8b25e43cf6c5e98fa80582b357dcae4"
     },
     "parentalcontrolsdictionary.json": {
       "size": 9440,
-      "modified": "2026-05-29T06:15:16.232Z",
+      "modified": "2026-05-31T06:20:37.994Z",
       "checksum": "718811486962e201734fcb0e7dbf0c1424a055bfdc86d01616fc847bb4f4ac18"
     },
     "parentalcontrolsgamecenter.json": {
       "size": 10581,
-      "modified": "2026-05-29T06:15:13.849Z",
+      "modified": "2026-05-31T06:20:35.740Z",
       "checksum": "bbc93a853835a8adffabefab855334b61f02fd89ecb570794d5bbd4133552d9a"
     },
     "parentalcontrolstimelimits.json": {
       "size": 12505,
-      "modified": "2026-05-29T06:14:44.873Z",
+      "modified": "2026-05-31T06:20:08.377Z",
       "checksum": "321f084b6245684d54c90aafe21a85a26885d299a7a3b6b69b559efde11814c7"
     },
     "passcode.json": {
       "size": 18484,
-      "modified": "2026-05-29T06:15:29.912Z",
+      "modified": "2026-05-31T06:20:51.679Z",
       "checksum": "c7ffad6d1d86f7705bef8868b9816b0958710f3984514ddfba19cfde442e3a0a"
     },
     "printing.json": {
       "size": 13261,
-      "modified": "2026-05-29T06:15:31.089Z",
+      "modified": "2026-05-31T06:20:52.819Z",
       "checksum": "a2558bb4e753b1fffd4d6ff0e4203f2f23a61d2ebd30e3fa1c3216aa1bb4582e"
     },
     "privacypreferencespolicycontrol.json": {
       "size": 8406,
-      "modified": "2026-05-29T06:15:10.266Z",
+      "modified": "2026-05-31T06:20:32.336Z",
       "checksum": "f5eeefa765d0115899524687b07b1045fed89c519fc89eb1058d8f83eba93755"
     },
     "profile-specific-payload-keys.json": {
       "size": 88271,
-      "modified": "2026-05-29T06:13:05.324Z",
+      "modified": "2026-05-31T06:18:31.881Z",
       "checksum": "781c0fe0fa53736631bb06fd22ebf0a96db8dd87e913c3ecf7568696fcb3bc3f"
     },
     "profileremovalpassword.json": {
       "size": 9664,
-      "modified": "2026-05-29T06:15:05.481Z",
+      "modified": "2026-05-31T06:20:27.828Z",
       "checksum": "937698d352c2524719065d1f16f12f697935774c8596163c9caf54ea6eee564b"
     },
     "relay.json": {
       "size": 15843,
-      "modified": "2026-05-29T06:13:32.429Z",
+      "modified": "2026-05-31T06:18:57.623Z",
       "checksum": "52da6b84d19b1408eee0f9b6b46b829afa69b1f80201b0f6b46e0c526844e366"
     },
     "restrictions.json": {
       "size": 139385,
-      "modified": "2026-05-29T06:13:43.393Z",
+      "modified": "2026-05-31T06:19:08.227Z",
       "checksum": "cba81af48ea89adfc30546562fb1e17d1e73aea4119cd0dd1356228cc769d3b9"
     },
     "scep.json": {
       "size": 17026,
-      "modified": "2026-05-29T06:14:14.997Z",
+      "modified": "2026-05-31T06:19:38.739Z",
       "checksum": "61adcdf643b531d99e2041bf9b1fea2ed43aa3f67653f91a1d2d48bbe1098436"
     },
     "screensaver.json": {
       "size": 13310,
-      "modified": "2026-05-29T06:14:37.652Z",
+      "modified": "2026-05-31T06:20:01.214Z",
       "checksum": "ec2775576c29f165e8b8778ea4f6b37f2dd56f294756a6ab6cb0828b5d4b30c7"
     },
     "screensaveruser.json": {
       "size": 12381,
-      "modified": "2026-05-29T06:15:07.837Z",
+      "modified": "2026-05-31T06:20:30.071Z",
       "checksum": "26cf7b8fe285638ba821e3473fd2e51c9fd9aa636db25d9942e53ae5b7efe368"
     },
     "securitypreferences.json": {
       "size": 8225,
-      "modified": "2026-05-29T06:15:28.745Z",
+      "modified": "2026-05-31T06:20:50.382Z",
       "checksum": "84398041da668f4f37a4c6332bd21f95951dc2a5b9a38081f72279622f709ec5"
     },
     "servicemanagementmanagedloginitems.json": {
       "size": 12045,
-      "modified": "2026-05-29T06:15:01.788Z",
+      "modified": "2026-05-31T06:20:24.407Z",
       "checksum": "4cf8600d315734748eea5caacc53a276b0aa5e56155ccfcc04aaaa7d1b78edd0"
     },
     "setupassistant.json": {
       "size": 17185,
-      "modified": "2026-05-29T06:13:08.087Z",
+      "modified": "2026-05-31T06:18:34.344Z",
       "checksum": "98a6ff10d99b728768fe390fb82c85f998a0b80cfb43900bf17772d0d1c105e3"
     },
     "sharekit.json": {
       "size": 11525,
-      "modified": "2026-05-29T06:14:47.292Z",
+      "modified": "2026-05-31T06:20:10.663Z",
       "checksum": "37a600380455fff97ec1ef7862df39706d7bb2cc9ec7f49f6efd16bb0d7a412d"
     },
     "singlesignon.json": {
       "size": 11785,
-      "modified": "2026-05-29T06:15:17.463Z",
+      "modified": "2026-05-31T06:20:39.121Z",
       "checksum": "78392b8abd8eab4d0979170a8bec87bd069ade2c7ec487137a0015be648bdb83"
     },
     "smartcard.json": {
       "size": 11050,
-      "modified": "2026-05-29T06:14:29.368Z",
+      "modified": "2026-05-31T06:19:52.782Z",
       "checksum": "1380641625e0d526b8e7a58082a9abb030d962501b2de45cc721fcb73add5ec4"
     },
     "softwareupdate.json": {
       "size": 10567,
-      "modified": "2026-05-29T06:14:20.980Z",
+      "modified": "2026-05-31T06:19:44.569Z",
       "checksum": "7e220fe2cfc896ec07597ca34d41819850247bb3f0794bd45f288e64c171fc7c"
     },
     "subscribedcalendars.json": {
       "size": 11625,
-      "modified": "2026-05-29T06:13:14.250Z",
+      "modified": "2026-05-31T06:18:40.207Z",
       "checksum": "60ef237062753586bd1a0947d6532fb40694b39f8a4d134b7ed5d6e623ed1295"
     },
     "systemextensions.json": {
       "size": 25618,
-      "modified": "2026-05-29T06:13:24.065Z",
+      "modified": "2026-05-31T06:18:49.528Z",
       "checksum": "0ca1aabd1da334d6a8c266395e76a9dc5cff635262021015479f6b2694b85b4e"
     },
     "systemlogging.json": {
       "size": 16188,
-      "modified": "2026-05-29T06:14:18.603Z",
+      "modified": "2026-05-31T06:19:42.314Z",
       "checksum": "def4a1967ed209247be1bb15053318fe85b07725d61130ac16820a106feaca03"
     },
     "systemmigration.json": {
       "size": 8658,
-      "modified": "2026-05-29T06:13:05.582Z",
+      "modified": "2026-05-31T06:18:32.068Z",
       "checksum": "5b9e2fdf4c06f81ebddfcb48fd451a850028c1bfd19fe5e4725836794b97c9f7"
     },
     "systempolicycontrol.json": {
       "size": 9760,
-      "modified": "2026-05-29T06:13:50.562Z",
+      "modified": "2026-05-31T06:19:15.173Z",
       "checksum": "32678d99b04c61729d453ca7ddba33cd6a550a7b45de682c96fdd558b7961173"
     },
     "systempolicykernelextensions.json": {
       "size": 11707,
-      "modified": "2026-05-29T06:14:31.746Z",
+      "modified": "2026-05-31T06:19:55.205Z",
       "checksum": "14172a6cdff10d0c33c17fcbb50a7a0e7a99b53cf93f3b72631deeb59f6d77cb"
     },
     "systempolicymanaged.json": {
       "size": 8476,
-      "modified": "2026-05-29T06:14:02.718Z",
+      "modified": "2026-05-31T06:19:27.053Z",
       "checksum": "0ad9b66b661f7ac1c1ee9e3e2f81de3c66b112c751c7489e844b46a2cac32394"
     },
     "systempolicyrule.json": {
       "size": 11825,
-      "modified": "2026-05-29T06:14:27.013Z",
+      "modified": "2026-05-31T06:19:50.464Z",
       "checksum": "a52fcb1395896f66ddc4726e32cb4283e223232d581d9a4ac0a7e8bbfd55ac58"
     },
     "systempreferences.json": {
       "size": 18537,
-      "modified": "2026-05-29T06:14:16.219Z",
+      "modified": "2026-05-31T06:19:39.926Z",
       "checksum": "456e6acea06051ce9a9f8aaec8444c33fccc9c11435c6797d517d660949b4c1b"
     },
     "timemachine.json": {
       "size": 14303,
-      "modified": "2026-05-29T06:14:19.811Z",
+      "modified": "2026-05-31T06:19:43.427Z",
       "checksum": "0865fd3eea8ae56c5e7a33e4c07aa43942a47e27a2ac35d45ea73366f1d543a0"
     },
     "timeserver.json": {
       "size": 11906,
-      "modified": "2026-05-29T06:13:31.157Z",
+      "modified": "2026-05-31T06:18:56.491Z",
       "checksum": "8fe7c6c015eabc2b2b5f0781e1fea8ab05e5f5ec65f5e975a4f9a9c59058ca1c"
     },
     "toplevel.json": {
       "size": 18479,
-      "modified": "2026-05-29T06:15:32.362Z",
+      "modified": "2026-05-31T06:20:54.192Z",
       "checksum": "bcc3881bc4e13f507eae3b5f6802c90dc070df1e88c460f4bfec7a3dd1d86bed"
     },
     "tvremote.json": {
       "size": 9488,
-      "modified": "2026-05-29T06:13:34.737Z",
+      "modified": "2026-05-31T06:18:59.891Z",
       "checksum": "8c43205ea0e34dd45e5d789b17e8b64c61b136eb09aed5739c6f30b00885fd42"
     },
     "userpreferences.json": {
       "size": 6935,
-      "modified": "2026-05-29T06:14:22.213Z",
+      "modified": "2026-05-31T06:19:45.684Z",
       "checksum": "e729ee7a67c4dace585bbff4a2b23f74f685ae11edd3d8e0eb5f5bc72c4f44f1"
     },
     "vpn.json": {
       "size": 24624,
-      "modified": "2026-05-29T06:13:53.064Z",
+      "modified": "2026-05-31T06:19:17.450Z",
       "checksum": "e3f5ae6def0d722b9a4c5e21d791f2258fdd0897d67de80ed76dac05f46315ae"
     },
     "webclip.json": {
       "size": 11264,
-      "modified": "2026-05-29T06:14:48.466Z",
+      "modified": "2026-05-31T06:20:11.806Z",
       "checksum": "41ed5cbb2a5b040e0dd0c420ff2e24fd99d75f23baa6e3ad82eed95ec2e3f121"
     },
     "webcontentfilter.json": {
       "size": 28314,
-      "modified": "2026-05-29T06:15:33.590Z",
+      "modified": "2026-05-31T06:20:55.509Z",
       "checksum": "a6bcc73b3265a120ae8e8e1fa94ef7d1fb5683b225a7a5068ddca2b1c5981af3"
     },
     "wifi.json": {
       "size": 31874,
-      "modified": "2026-05-29T06:15:34.879Z",
+      "modified": "2026-05-31T06:20:56.830Z",
       "checksum": "2eda4b0852140c877da60164961331ff47facc621ac0a321062a319f9176aa54"
     },
     "wifimanagedsettings.json": {
       "size": 12818,
-      "modified": "2026-05-29T06:14:42.563Z",
+      "modified": "2026-05-31T06:20:06.023Z",
       "checksum": "6a014160070678f928c193367d0604852407923e16d160d5f48456f3ddae2c22"
     },
     "xsan.json": {
       "size": 9906,
-      "modified": "2026-05-29T06:14:35.284Z",
+      "modified": "2026-05-31T06:19:58.871Z",
       "checksum": "9fcd14dc56b3418417331558dc44c7350a0645a79ac36108f73aa98b4ed5ff2c"
     },
     "xsanpreferences.json": {
       "size": 10028,
-      "modified": "2026-05-29T06:13:59.077Z",
+      "modified": "2026-05-31T06:19:23.466Z",
       "checksum": "aaf345dc4de624017a88bfdefd5791283f7efc411e6a78eafd39a6a9ad3a6e0d"
     }
   }
