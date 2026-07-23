@@ -234,6 +234,14 @@ jobs:
             }
 
             findUrls(data);
+
+            // Apple publishes some Device Management object pages that are not
+            // referenced by profile-specific-payload-keys.json. Keep a curated
+            // allowlist so cache refreshes do not drop those parseable docs.
+            [
+              'diskmanagementsettingsrestrictionsobject'
+            ].forEach(slug => urls.add(slug + '.json'));
+
             console.log(Array.from(urls).join(' '));
           } catch (error) {
             console.error('Error parsing main specification:', error.message);

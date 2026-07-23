@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-23T05:27:01.504Z",
+  "generated_at": "2026-07-23T18:34:00.688Z",
   "total_files": 130,
   "files": {
     "8021xfirstactiveethernet.json": {
@@ -206,6 +206,11 @@
       "size": 23364,
       "modified": "2026-07-23T05:24:59.435Z",
       "checksum": "e8394663ecb41671c1225d713821064a10102ddaa7e9555166aa422cc89f55a2"
+    },
+    "diskmanagementsettingsrestrictionsobject.json": {
+      "size": 4950,
+      "modified": "2026-07-23T18:32:24.436Z",
+      "checksum": "9d12bafdc66e360611a5f5a58196387259d33ffe206c0f9be354685ce3217139"
     },
     "dnsproxy.json": {
       "size": 11113,
