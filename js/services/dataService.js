@@ -740,6 +740,14 @@ class DataService {
 
                 progressService.log(`Created section: ${section.name} (${section.identifier}) from topicSection`, 'info');
 
+                // Expand each Apple identifier into a selectable payload/object section.
+                const subSections = this.createSubSectionsFromIdentifiers(topicSection, section);
+                sections.push(...subSections);
+
+                if (subSections.length > 0) {
+                    progressService.log(`Created ${subSections.length} sub-sections for ${section.name}`, 'info');
+                }
+
             } catch (error) {
                 progressService.log(`Error processing topicSection ${index}: ${error.message}`, 'warning');
             }
@@ -899,6 +907,15 @@ class DataService {
                 category: 'Apps',
                 priority: 'medium',
                 identifiers: ['com.apple.developer.associated-domains', 'AssociatedDomains']
+            },
+            {
+                name: 'Disk Management Settings Restrictions',
+                identifier: 'diskmanagementsettingsrestrictionsobject',
+                description: 'Configure disk mount restrictions for external and network storage',
+                platforms: ['macOS'],
+                category: 'Security',
+                priority: 'medium',
+                identifiers: ['DiskManagementSettingsRestrictionsObject']
             }
         ];
 
@@ -1274,6 +1291,11 @@ class DataService {
                 const defaultAttr = item.attributes.find(attr => attr.kind === 'default');
                 if (defaultAttr && defaultAttr.value !== undefined) {
                     property.defaultValue = defaultAttr.value;
+                }
+
+                const allowedValuesAttr = item.attributes.find(attr => attr.kind === 'allowedValues');
+                if (allowedValuesAttr && Array.isArray(allowedValuesAttr.values)) {
+                    property.allowedValues = allowedValuesAttr.values;
                 }
             }
 
@@ -1982,7 +2004,7 @@ class DataService {
                 // Extract configuration type name from identifier URL
                 const configTypeName = this.extractConfigTypeFromIdentifier(identifier);
 
-                if (configTypeName && configTypeName !== parentSection.identifier) {
+                if (configTypeName && configTypeName.toLowerCase() !== parentSection.identifier.toLowerCase()) {
                     const subSection = {
                         name: this.formatConfigTypeName(configTypeName),
                         identifier: configTypeName.toLowerCase(),
@@ -2212,7 +2234,7 @@ class DataService {
                 deprecated: Boolean(propDef.deprecated),
                 platforms: platforms,
                 url: '', // Property definitions don't typically have URLs
-                enumValues: [], // Could be enhanced to extract enum values if present
+                enumValues: Array.isArray(propDef.allowedValues) ? propDef.allowedValues : [],
                 defaultValue: propDef.defaultValue,
                 constraints: {
                     introducedVersion: propDef.introducedVersion
@@ -2678,13 +2700,6 @@ class DataService {
         // Check for exact matches first
         if (knownSections[lowerIdentifier]) {
             return knownSections[lowerIdentifier];
-        }
-
-        // Check for partial matches
-        for (const [key, value] of Object.entries(knownSections)) {
-            if (lowerIdentifier.includes(key)) {
-                return value;
-            }
         }
 
         // If no match found, clean up the identifier

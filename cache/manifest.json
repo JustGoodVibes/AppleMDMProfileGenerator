@@ -1,6 +1,6 @@
 {
-  "generated_at": "2025-07-11T17:24:31.444Z",
-  "total_files": 129,
+  "generated_at": "2026-07-23T18:34:00.688Z",
+  "total_files": 130,
   "files": {
     "8021xfirstactiveethernet.json": {
       "size": 13568,
@@ -201,6 +201,11 @@
       "size": 22879,
       "modified": "2025-07-11T17:24:12.668Z",
       "checksum": "3368adec0b574a8ee1db174ea99b3d575e6a18aa4b09dd4cc890d716231543ba"
+    },
+    "diskmanagementsettingsrestrictionsobject.json": {
+      "size": 4950,
+      "modified": "2026-07-23T18:32:24.436Z",
+      "checksum": "9d12bafdc66e360611a5f5a58196387259d33ffe206c0f9be354685ce3217139"
     },
     "dnsproxy.json": {
       "size": 10343,
